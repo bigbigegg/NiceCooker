@@ -4,7 +4,6 @@ import { useRecipeStore } from '@/stores/recipeStore';
 import { useCraftingStore } from '@/stores/craftingStore';
 import { RECIPES_BY_ID } from '@/config/recipes';
 import { logger } from '@/utils/Logger';
-import { CraftingQueue } from './CraftingQueue';
 import './OrderPanel.css';
 
 interface OrderInfo { customerId: string; typeId: string; orderRecipeId: string | null; state: string; }
@@ -85,7 +84,6 @@ export function OrderPanel() {
           <button className="order-panel__craft-btn" onClick={handleCraft}>☕ 制作 {recipe.name}</button>
         )}
 
-        <CraftingQueue />
       </div>
     </div>
   );

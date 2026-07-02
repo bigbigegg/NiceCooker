@@ -14,6 +14,7 @@ import { useCustomerStore } from '@/stores/customerStore';
 import { RECIPES_BY_ID } from '@/config/recipes';
 import { logger } from '@/utils/Logger';
 import { OrderPanel } from '@/ui/components/OrderPanel/OrderPanel';
+import { CraftingQueue } from '@/ui/components/CraftingQueue/CraftingQueue';
 import type { GameTime } from '@/types';
 import './App.css';
 
@@ -100,6 +101,7 @@ export function App() {
       <div className="game-area" ref={canvasRef} onClick={() => eventBus.emit('order:close', null)}>
         <GameCanvas containerRef={canvasRef} />
         <OrderPanel />
+        <CraftingQueue />
       </div>
       <NavBar />
     </div>

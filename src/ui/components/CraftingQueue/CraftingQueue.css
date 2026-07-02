@@ -1,0 +1,80 @@
+.crafting-queue {
+  position: absolute;
+  bottom: 60px;
+  left: 16px;
+  width: 200px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(62, 39, 35, 0.18);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.crafting-queue--collapsed {
+  width: auto;
+}
+
+.crafting-queue__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #5D4037;
+  color: #FFF8E1;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.crafting-queue__toggle {
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.crafting-queue__body {
+  padding: 8px 12px;
+}
+
+.crafting-queue__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.crafting-queue__name {
+  font-size: 11px;
+  color: #3E2723;
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.crafting-queue__bar {
+  flex: 1;
+  height: 4px;
+  background: #EFEBE9;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.crafting-queue__fill {
+  height: 100%;
+  background: #795548;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.crafting-queue__pct {
+  font-size: 10px;
+  color: #8D6E63;
+  width: 26px;
+  text-align: right;
+}
+
+.crafting-queue__empty {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #A1887F;
+  text-align: center;
+}
