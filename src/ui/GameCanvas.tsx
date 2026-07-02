@@ -75,7 +75,9 @@ export function GameCanvas({ containerRef }: GameCanvasProps) {
     </div>;
   }
 
-  return <div ref={canvasWrapperRef} style={{ width:'100%', height:'100%' }} />;
+  // 阻止 canvas 点击冒泡到 game-area（避免触发 order:close）
+  return <div ref={canvasWrapperRef} style={{ width:'100%', height:'100%' }}
+    onClick={(e) => e.stopPropagation()} />;
 }
 
 /** 地板网格 */
