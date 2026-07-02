@@ -34,11 +34,11 @@ const RECIPE_ICONS: Record<string, string> = {
 };
 
 /** 头部半径 */
-const HEAD_RADIUS = 10;
+const HEAD_RADIUS = 15;
 /** 身体宽高 */
-const BODY_W = 15;
-const BODY_H = 18;
-const BODY_R = 4;
+const BODY_W = 22;
+const BODY_H = 26;
+const BODY_R = 6;
 
 /** 离开动画持续时间（秒） */
 const LEAVE_ANIM_DURATION = 0.8;
@@ -198,8 +198,8 @@ export class CustomerSprite extends Container {
     const bubble = this.bubbleContainer;
     bubble.removeChildren();
 
-    const bubbleW = 64;
-    const bubbleH = 48;
+    const bubbleW = 88;
+    const bubbleH = 60;
     const bubbleX = -bubbleW / 2;
     const bubbleY = -BODY_H / 2 - HEAD_RADIUS * 2 - bubbleH - 2;
 
@@ -230,10 +230,10 @@ export class CustomerSprite extends Container {
     }
     const stateText = new Text({
       text: label,
-      style: { fontSize: 11, fontFamily: 'PingFang SC, sans-serif', fill: 0x3E2723, fontWeight: 'bold' },
+      style: { fontSize: 13, fontFamily: 'PingFang SC, sans-serif', fill: 0x3E2723, fontWeight: 'bold' },
     });
     stateText.anchor.set(0.5, 0);
-    stateText.y = bubbleY + 5;
+    stateText.y = bubbleY + 6;
     stateText.x = 0;
     bubble.addChild(stateText);
 
@@ -245,20 +245,20 @@ export class CustomerSprite extends Container {
         style: { fontSize: 12, fontFamily: 'Arial' },
       });
       orderText.anchor.set(0.5, 0);
-      orderText.y = bubbleY + 20;
+      orderText.y = bubbleY + 24;
       bubble.addChild(orderText);
     }
 
     // 等待进度条
     const barBg = new Graphics();
-    barBg.roundRect(bubbleX + 8, bubbleY + 38, bubbleW - 16, 4, 2);
+    barBg.roundRect(bubbleX + 10, bubbleY + 46, bubbleW - 20, 5, 2);
     barBg.fill({ color: 0xE0E0E0 });
     bubble.addChild(barBg);
 
     const clamped = Math.max(0, Math.min(1, waitProgress));
     const barColor = clamped > 0.6 ? 0xEF5350 : clamped > 0.3 ? 0xFFCA28 : 0x66BB6A;
     const barFill = new Graphics();
-    barFill.roundRect(bubbleX + 8, bubbleY + 38, (bubbleW - 16) * clamped, 4, 2);
+    barFill.roundRect(bubbleX + 10, bubbleY + 46, (bubbleW - 20) * clamped, 5, 2);
     barFill.fill({ color: barColor });
     bubble.addChild(barFill);
 

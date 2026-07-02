@@ -15,9 +15,9 @@ export class RenderSystem {
   private initialized = false;
 
   private seatPositions: Position[] = [
-    { x: 200, y: 300 }, { x: 350, y: 300 }, { x: 500, y: 300 }, { x: 650, y: 300 },
-    { x: 275, y: 420 }, { x: 425, y: 420 }, { x: 575, y: 420 },
-    { x: 275, y: 520 }, { x: 425, y: 520 }, { x: 575, y: 520 },
+    { x: 180, y: 280 }, { x: 380, y: 280 }, { x: 580, y: 280 }, { x: 780, y: 280 },
+    { x: 280, y: 420 }, { x: 480, y: 420 }, { x: 680, y: 420 },
+    { x: 280, y: 550 }, { x: 480, y: 550 }, { x: 680, y: 550 },
   ];
   private seatOccupancy = new Map<string, Position>();
 
