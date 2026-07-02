@@ -18,14 +18,15 @@ export function OrderPanel() {
   const crafting = useCraftingStore();
 
   useEffect(() => {
-    return eventBus.on<OrderInfo>('customer:click', (info) => {
+    const unsubClick = eventBus.on<OrderInfo>('customer:click', (info) => {
       logger.info('app', `👆 点击顾客 id=${info.customerId} type=${info.typeId} state=${info.state} recipe=${info.orderRecipeId ?? '无'}`);
       setOrder(info);
-      // 如果不是当前制作中的顾客，只清除旧的完成结果（保留进度）
       if (info.customerId !== useCraftingStore.getState().activeCustomerId) {
         useCraftingStore.getState().clearResult();
       }
     });
+    const unsubClose = eventBus.on('order:close', () => setOrder(null));
+    return () => { unsubClick(); unsubClose(); };
   }, []);
 
   if (!order) return null;
@@ -51,7 +52,7 @@ export function OrderPanel() {
   };
 
   return (
-    <div className="order-panel">
+    <div className="order-panel" onClick={(e) => e.stopPropagation()}>
       <div className="order-panel__header">
         <span>{TYPE_NAMES[order.typeId] ?? order.typeId}</span>
         <button className="order-panel__close" onClick={handleClose}>✕</button>

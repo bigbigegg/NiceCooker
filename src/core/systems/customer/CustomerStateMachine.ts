@@ -80,10 +80,17 @@ export class CustomerStateMachine {
 
   /** 可选的菜单项 ID 列表（由外部注入） */
   private availableRecipes: string[];
+  /** 点单所需时间（随机，在顾客类型配置范围内） */
+  private orderDuration: number;
 
   constructor(customerId: string, availableRecipes: string[] = []) {
     this.customerId = customerId;
     this.availableRecipes = availableRecipes;
+
+    // 根据顾客类型随机点单耗时
+    const customer = useCustomerStore.getState().customers[customerId];
+    const [min, max] = customer?.config?.orderDuration ?? [1, 3];
+    this.orderDuration = min + Math.random() * (max - min);
   }
 
   /**
@@ -142,7 +149,7 @@ export class CustomerStateMachine {
    * 若无可用菜品，直接离店。
    */
   private updateOrdering(elapsed: number): boolean {
-    if (elapsed < CUSTOMER_GLOBAL.orderDuration) return false;
+    if (elapsed < this.orderDuration) return false;
 
     const customer = useCustomerStore.getState().customers[this.customerId];
     if (!customer) return true;

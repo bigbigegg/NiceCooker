@@ -15,6 +15,7 @@ const CUSTOMER_DEFAULTS: CustomerTypeConfig = {
   maxSpending: 30,
   returnThreshold: 5,
   returnSpendingBonus: 0.1,
+  orderDuration: [1, 3],
 };
 
 /** 7 种顾客类型配置（Game-Design 3.1.2） */
@@ -33,6 +34,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: 40,
     returnThreshold: 5,
     returnSpendingBonus: 0.1,
+    orderDuration: [0.5, 1.5],
   },
 
   student: {
@@ -49,6 +51,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: CUSTOMER_DEFAULTS.maxSpending,
     returnThreshold: 3,
     returnSpendingBonus: CUSTOMER_DEFAULTS.returnSpendingBonus,
+    orderDuration: [1, 2.5],
   },
 
   retiree: {
@@ -65,6 +68,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: CUSTOMER_DEFAULTS.maxSpending,
     returnThreshold: CUSTOMER_DEFAULTS.returnThreshold,
     returnSpendingBonus: CUSTOMER_DEFAULTS.returnSpendingBonus,
+    orderDuration: [2, 5],
   },
 
   influencer: {
@@ -81,6 +85,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: CUSTOMER_DEFAULTS.maxSpending,
     returnThreshold: CUSTOMER_DEFAULTS.returnThreshold,
     returnSpendingBonus: CUSTOMER_DEFAULTS.returnSpendingBonus,
+    orderDuration: [1.5, 3],
   },
 
   business: {
@@ -97,6 +102,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: CUSTOMER_DEFAULTS.maxSpending,
     returnThreshold: CUSTOMER_DEFAULTS.returnThreshold,
     returnSpendingBonus: CUSTOMER_DEFAULTS.returnSpendingBonus,
+    orderDuration: [0.5, 1],
   },
 
   artist: {
@@ -113,6 +119,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: CUSTOMER_DEFAULTS.maxSpending,
     returnThreshold: CUSTOMER_DEFAULTS.returnThreshold,
     returnSpendingBonus: CUSTOMER_DEFAULTS.returnSpendingBonus,
+    orderDuration: [2, 5],
   },
 
   special: {
@@ -129,6 +136,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     maxSpending: 200,
     returnThreshold: CUSTOMER_DEFAULTS.returnThreshold,
     returnSpendingBonus: 0.5,
+    orderDuration: [1, 2],
   },
 };
 

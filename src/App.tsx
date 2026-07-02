@@ -97,7 +97,7 @@ export function App() {
   return (
     <div className="app-container">
       <StatusBar />
-      <div className="game-area" ref={canvasRef}>
+      <div className="game-area" ref={canvasRef} onClick={() => eventBus.emit('order:close', null)}>
         <GameCanvas containerRef={canvasRef} />
         <OrderPanel />
       </div>

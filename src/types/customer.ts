@@ -23,6 +23,8 @@ export interface CustomerTypeConfig {
   maxSpending: number;
   returnThreshold: number;
   returnSpendingBonus: number;
+  /** 点单耗时范围 [最小秒, 最大秒] */
+  orderDuration: [number, number];
 }
 
 /** 顾客状态 */
