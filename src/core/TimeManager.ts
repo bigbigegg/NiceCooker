@@ -73,14 +73,22 @@ export class TimeManager {
     // 累积游戏秒
     this._totalGameSeconds += deltaSeconds * this._gameTime.speed * GAME_SECONDS_PER_REAL_SECOND;
 
-    // 计算当前天、时、分（基于累积游戏秒）
+    // 计算当前天、时、分
     const totalGameMinutes = Math.floor(this._totalGameSeconds / 60);
     const day = Math.floor(totalGameMinutes / (24 * 60)) + 1;
     const hour = Math.floor(totalGameMinutes / 60) % 24;
     const minute = totalGameMinutes % 60;
     const phase = TimeManager.hourToPhase(hour);
 
-    // 检测阶段变化
+    // 每秒一次日志
+    const prevSecond = Math.floor((this._totalGameSeconds - deltaSeconds * this._gameTime.speed * 120) % 60);
+    if (Math.floor(this._totalGameSeconds % 60) !== Math.floor(prevSecond)) {
+      console.log('[TimeManager] totalGameSeconds:', Math.floor(this._totalGameSeconds),
+        `→ Day${day} ${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`,
+        'phase:', phase);
+    }
+
+    // 阶段变化
     if (phase !== this._gameTime.phase) {
       const prevPhase = this._gameTime.phase;
       const prevDay = this._gameTime.day;
@@ -88,7 +96,6 @@ export class TimeManager {
       this._gameTime.day = day;
       this._gameTime.hour = hour;
       this._gameTime.minute = minute;
-
       eventBus.emit('time:phaseChange', { from: prevPhase, to: phase });
       if (day > prevDay) {
         eventBus.emit('time:dayEnd', { day: prevDay });

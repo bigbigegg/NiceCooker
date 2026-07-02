@@ -28,8 +28,10 @@ export function App() {
     let lastDisplay = '';
     const unsubTime = eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
       const display = `${time.hour}:${time.minute}`;
+      console.log('[App] time:tick — raw:', time.hour, time.minute, 'display:', display, 'last:', lastDisplay);
       if (display !== lastDisplay) {
         lastDisplay = display;
+        console.log('[App] → updating timeStore to', display);
         useTimeStore.getState().setTime(time);
       }
     });
