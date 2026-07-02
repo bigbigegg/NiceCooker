@@ -47,14 +47,19 @@ export class GameLoop {
 
   /** 启动主循环 */
   start(): void {
-    if (this.running) return;
+    if (this.running) {
+      console.log('[GameLoop] already running, skip');
+      return;
+    }
     this.running = true;
     this.lastTime = performance.now();
+    console.log('[GameLoop] started, time:', this._timeManager.gameTime);
     this.tick(this.lastTime);
   }
 
   /** 停止主循环 */
   stop(): void {
+    console.log('[GameLoop] stop called, running:', this.running);
     this.running = false;
     cancelAnimationFrame(this.rafId);
   }
@@ -68,6 +73,12 @@ export class GameLoop {
 
     // 1. 更新时间
     this._timeManager.update(deltaSeconds);
+    // 每秒打印一次心跳（仅在秒数变化时）
+    if (Math.floor(now / 1000) !== Math.floor((now - deltaSeconds * 1000) / 1000)) {
+      console.log('[GameLoop] tick — gameTime:',
+        `Day${this._timeManager.gameTime.day} ${String(this._timeManager.gameTime.hour).padStart(2,'0')}:${String(this._timeManager.gameTime.minute).padStart(2,'0')}`,
+        'phase:', this._timeManager.gameTime.phase);
+    }
     eventBus.emit('time:tick', { time: this._timeManager.gameTime });
 
     // 2. 更新各系统

@@ -26,7 +26,7 @@ export function App() {
 
     // 同步时间到 UI（节流：仅当时分变化）
     let lastDisplay = '';
-    eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
+    const unsubTime = eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
       const display = `${time.hour}:${time.minute}`;
       if (display !== lastDisplay) {
         lastDisplay = display;
@@ -39,6 +39,7 @@ export function App() {
     return () => {
       gameLoop.stop();
       customerSystem.stop();
+      unsubTime();
     };
   }, [setLoading]);
 
