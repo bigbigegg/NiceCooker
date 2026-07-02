@@ -1,22 +1,19 @@
 import { gameLoop } from '@/core/GameLoop';
 import { eventBus } from '@/core/EventBus';
 import { useCustomerStore } from '@/stores/customerStore';
+import { useRecipeStore } from '@/stores/recipeStore';
+import { ALL_RECIPES } from '@/config/recipes';
 import { CustomerGenerator } from './CustomerGenerator';
 import { CustomerStateMachine } from './CustomerStateMachine';
 import type { CustomerInstance } from '@/types/customer';
 
-/** 默认可用菜单（后续接入 recipeStore 后替换） */
-const DEFAULT_RECIPE_IDS: string[] = [
-  'americano',
-  'latte',
-  'cappuccino',
-  'mocha',
-  'espresso',
-  'pour_over',
-  'cold_brew',
-  'single_origin',
-  'classic',
-];
+/** 从食谱配置中提取所有已解锁食谱 ID */
+function getAvailableRecipeIds(): string[] {
+  const unlocked = useRecipeStore.getState().unlockedRecipeIds;
+  if (unlocked.size > 0) return Array.from(unlocked);
+  // 初始解锁 Lv1 食谱
+  return ALL_RECIPES.filter((r) => r.unlockLevel <= 1).map((r) => r.id);
+}
 
 /**
  * 顾客系统入口
@@ -32,9 +29,9 @@ export class CustomerSystem {
   private availableRecipes: string[];
   private unsubServe: (() => void) | null = null;
 
-  constructor(availableRecipes: string[] = DEFAULT_RECIPE_IDS) {
+  constructor() {
     this.generator = new CustomerGenerator();
-    this.availableRecipes = availableRecipes;
+    this.availableRecipes = [];
   }
 
   /**
@@ -103,6 +100,9 @@ export class CustomerSystem {
    * 处理新生成的顾客
    */
   private onCustomerGenerated(customer: CustomerInstance): void {
+    // 刷新可用菜单
+    this.availableRecipes = getAvailableRecipeIds();
+
     // 添加到 Store
     useCustomerStore.getState().addCustomer(customer);
 

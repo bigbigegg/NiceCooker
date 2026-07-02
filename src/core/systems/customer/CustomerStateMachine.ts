@@ -2,6 +2,7 @@ import { eventBus } from '@/core/EventBus';
 import { useCustomerStore } from '@/stores/customerStore';
 import { usePlayerStore } from '@/stores/playerStore';
 import { CUSTOMER_GLOBAL } from '@/config/customers';
+import { RECIPES_BY_ID } from '@/config/recipes';
 import type { CustomerInstance, SatisfactionParams, CustomerStateType } from '@/types/customer';
 
 /**
@@ -262,10 +263,14 @@ export class CustomerStateMachine {
 
     const preferences = customer.config.preferences;
 
-    // 筛选偏好中实际可用的菜品
-    const preferredAvailable = preferences.filter((pref) =>
-      this.availableRecipes.includes(pref),
-    );
+    // 从可用食谱中匹配偏好（按 ID 或 category 匹配）
+    const preferredAvailable = this.availableRecipes.filter((id) => {
+      const recipe = RECIPES_BY_ID.get(id);
+      if (!recipe) return false;
+      return preferences.some(
+        (pref) => id === pref || recipe.category === pref,
+      );
+    });
 
     if (preferredAvailable.length > 0) {
       return preferredAvailable[Math.floor(Math.random() * preferredAvailable.length)]!;
