@@ -4,6 +4,7 @@ import type { Position } from '@/types';
 import { CUSTOMER_COLORS } from '../types';
 import { eventBus } from '@/core/EventBus';
 import { useCustomerStore } from '@/stores/customerStore';
+import { useCraftingStore } from '@/stores/craftingStore';
 
 /** 顾客类型对应颜色 */
 const TYPE_COLORS: Record<CustomerTypeId, number> = {
@@ -212,15 +213,20 @@ export class CustomerSprite extends Container {
     bg.fill({ color: 0xFFFFFF });
     bubble.addChild(bg);
 
-    // 状态文字
-    const stateLabels: Record<string, string> = {
-      entering: '🚶 进店中...',
-      ordering: '📖 浏览菜单...',
-      waiting: '📋 待出餐',
-      eating: '😋 进餐中',
-      leaving: '👋 离开中...',
-    };
-    const label = stateLabels[state] ?? state;
+    // 状态文字（细化 waiting 状态）
+    let label: string;
+    if (state === 'waiting') {
+      const isCrafting = useCraftingStore.getState().activeCustomerId === this.customerId;
+      label = isCrafting ? '🔨 制作中' : '📋 待接单';
+    } else {
+      const stateLabels: Record<string, string> = {
+        entering: '🚶 进店中...',
+        ordering: '📖 浏览菜单...',
+        eating: '😋 进餐中',
+        leaving: '👋 离开中...',
+      };
+      label = stateLabels[state] ?? state;
+    }
     const stateText = new Text({
       text: label,
       style: { fontSize: 11, fontFamily: 'PingFang SC, sans-serif', fill: 0x3E2723, fontWeight: 'bold' },
