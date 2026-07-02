@@ -22,18 +22,23 @@ export function App() {
   const isLoading = useUIStore((s) => s.isLoading);
 
   useEffect(() => {
-    // 初始化配方 Store（加载初始食谱、启动制作系统）
+    // 初始化配方 Store
     useRecipeStore.getState().init();
 
-    // 启动顾客系统（注册到 GameLoop）
+    // 启动顾客系统
     customerSystem.start();
 
     // 启动游戏主循环
     gameLoop.start();
 
-    // 同步时间状态到 UI
+    // 同步时间到 UI（仅当时分变化时更新，避免每帧渲染）
+    let lastDisplay = '';
     const unsub = eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
-      useTimeStore.getState().setTime(time);
+      const display = `${time.hour}:${time.minute}`;
+      if (display !== lastDisplay) {
+        lastDisplay = display;
+        useTimeStore.getState().setTime(time);
+      }
     });
 
     setLoading(false);

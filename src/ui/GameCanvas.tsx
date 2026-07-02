@@ -45,11 +45,17 @@ export function GameCanvas({ containerRef }: GameCanvasProps) {
       canvas.style.top = '0';
       canvas.style.left = '0';
 
-      // 手动监听容器尺寸变化
+      // 手动监听容器尺寸变化（防抖避免循环触发）
+      let resizeTimer: ReturnType<typeof setTimeout>;
       const observer = new ResizeObserver(() => {
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        app.renderer.resize(w, h);
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          if (w > 0 && h > 0 && (app.renderer.width !== w || app.renderer.height !== h)) {
+            app.renderer.resize(w, h);
+          }
+        }, 100);
       });
       observer.observe(container);
       resizeObserverRef.current = observer;
