@@ -147,6 +147,7 @@ export class CustomerSprite extends Container {
     this.animTimer += 1 / 60; // 近似 deltaSeconds
 
     // 状态动画
+    this.scale.set(1); // 每帧重置，避免残留变形
     switch (customer.state) {
       case 'entering':
         this.alpha = Math.min(1, this.alpha + 0.05);
@@ -156,7 +157,7 @@ export class CustomerSprite extends Container {
         this.x = this.worldPos.x + Math.sin(this.animTimer * 3) * 1.5;
         break;
       case 'eating':
-        this.scale.set(1.1, 0.85);
+        this.y = this.worldPos.y + Math.sin(this.animTimer * 2) * 2;
         break;
     }
 
