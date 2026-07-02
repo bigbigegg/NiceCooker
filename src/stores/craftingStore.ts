@@ -12,6 +12,7 @@ interface CraftingState {
   setProgress: (progress: number) => void;
   completeCrafting: (result: string) => void;
   reset: () => void;
+  clearResult: () => void;
 }
 
 /**
@@ -32,4 +33,5 @@ export const useCraftingStore = create<CraftingState>((set) => ({
   completeCrafting: (result) => set({ result, progress: 100 }),
 
   reset: () => set({ activeCustomerId: null, progress: 0, result: null }),
+  clearResult: () => set({ result: null }),
 }));

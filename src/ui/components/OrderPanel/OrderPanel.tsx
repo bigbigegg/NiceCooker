@@ -21,6 +21,10 @@ export function OrderPanel() {
     return eventBus.on<OrderInfo>('customer:click', (info) => {
       logger.info('app', `👆 点击顾客 id=${info.customerId} type=${info.typeId} state=${info.state} recipe=${info.orderRecipeId ?? '无'}`);
       setOrder(info);
+      // 如果不是当前制作中的顾客，只清除旧的完成结果（保留进度）
+      if (info.customerId !== useCraftingStore.getState().activeCustomerId) {
+        useCraftingStore.getState().clearResult();
+      }
     });
   }, []);
 
