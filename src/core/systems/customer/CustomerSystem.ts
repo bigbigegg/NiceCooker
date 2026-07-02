@@ -3,6 +3,7 @@ import { eventBus } from '@/core/EventBus';
 import { useCustomerStore } from '@/stores/customerStore';
 import { useRecipeStore } from '@/stores/recipeStore';
 import { ALL_RECIPES } from '@/config/recipes';
+import { logger } from '@/utils/Logger';
 import { CustomerGenerator } from './CustomerGenerator';
 import { CustomerStateMachine } from './CustomerStateMachine';
 import type { CustomerInstance } from '@/types/customer';
@@ -47,13 +48,21 @@ export class CustomerSystem {
     this.unsubServe = eventBus.on<{ customerId: string; satisfaction: number }>(
       'customer:serve',
       ({ customerId, satisfaction }) => {
-        // 顾客可能已经离店，需要检查
         const store = useCustomerStore.getState();
         const customer = store.customers[customerId];
         if (customer) {
-          // satisfaction 在此表示餐品品质分数 (0-100)，用于后续满意度计算
           store.markServed(customerId, satisfaction);
         }
+      },
+    );
+
+    // 监听顾客离店
+    eventBus.on<{ customerId: string; reason: string }>(
+      'customer:leave',
+      ({ customerId, reason }) => {
+        const customer = useCustomerStore.getState().customers[customerId];
+        const typeLabel = customer?.typeId ?? '?';
+        logger.info('customer', `🏃 顾客离店 id=${customerId} type=${typeLabel} reason=${reason}`);
       },
     );
   }
@@ -78,7 +87,7 @@ export class CustomerSystem {
     // 1. 生成新顾客
     const newCustomers = this.generator.update();
     for (const customer of newCustomers) {
-      this.onCustomerGenerated(customer);
+      this.onCustomerArrive(customer);
     }
 
     // 2. 更新状态机
@@ -99,7 +108,8 @@ export class CustomerSystem {
   /**
    * 处理新生成的顾客
    */
-  private onCustomerGenerated(customer: CustomerInstance): void {
+  private onCustomerArrive(customer: CustomerInstance): void {
+    logger.info('customer', `🚶 顾客进店 id=${customer.id} type=${customer.typeId}`);
     // 刷新可用菜单
     this.availableRecipes = getAvailableRecipeIds();
 

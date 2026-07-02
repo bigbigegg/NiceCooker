@@ -62,8 +62,10 @@ export function App() {
           if (customer?.state === 'waiting') {
             useCustomerStore.getState().markServed(customerId, quality);
             const multiplier = [0, 0.7, 0.8, 0.9, 1.2, 1.5][stars] ?? 1;
-            usePlayerStore.getState().earnGold(Math.round((recipe?.basePrice ?? 30) * multiplier), 'service');
+            const earned = Math.round((recipe?.basePrice ?? 30) * multiplier);
+            usePlayerStore.getState().earnGold(earned, 'service');
             usePlayerStore.getState().addExp(recipe?.baseExp ?? 12);
+            logger.info('economy', `💰 金币 +${earned} (${recipe?.name} ${stars}星) | EXP +${recipe?.baseExp ?? 12} | customer=${customerId}`);
           }
         }
       },

@@ -3,6 +3,7 @@ import { eventBus } from '@/core/EventBus';
 import { useRecipeStore } from '@/stores/recipeStore';
 import { useCraftingStore } from '@/stores/craftingStore';
 import { RECIPES_BY_ID } from '@/config/recipes';
+import { logger } from '@/utils/Logger';
 import './OrderPanel.css';
 
 interface OrderInfo { customerId: string; typeId: string; orderRecipeId: string | null; state: string; }
@@ -17,7 +18,10 @@ export function OrderPanel() {
   const crafting = useCraftingStore();
 
   useEffect(() => {
-    return eventBus.on<OrderInfo>('customer:click', (info) => setOrder(info));
+    return eventBus.on<OrderInfo>('customer:click', (info) => {
+      logger.info('app', `👆 点击顾客 id=${info.customerId} type=${info.typeId} state=${info.state} recipe=${info.orderRecipeId ?? '无'}`);
+      setOrder(info);
+    });
   }, []);
 
   if (!order) return null;
@@ -28,10 +32,18 @@ export function OrderPanel() {
   const handleCraft = () => {
     if (!recipe) return;
     const ok = useRecipeStore.getState().startCrafting(recipe.id, 'coffee_machine');
-    if (ok) crafting.startCrafting(order.customerId);
+    if (ok) {
+      logger.info('app', `🔨 开始制作 ${recipe.name} for customer=${order.customerId}`);
+      crafting.startCrafting(order.customerId);
+    } else {
+      logger.warn('app', `❌ 制作失败 ${recipe.name}`);
+    }
   };
 
-  const handleClose = () => setOrder(null);
+  const handleClose = () => {
+    logger.debug('app', `✕ 关闭订单面板 customer=${order.customerId}`);
+    setOrder(null);
+  };
 
   return (
     <div className="order-panel">

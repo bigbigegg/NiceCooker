@@ -23,6 +23,7 @@ export function StatusBar() {
     const current = speeds.indexOf(time.speed);
     const next = speeds[(current + 1) % speeds.length]!;
     gameLoop.timeManager.setSpeed(next);
+    logger.info('app', `⏩ 速度切换: ${time.speed}x → ${next}x`);
   };
 
   return (

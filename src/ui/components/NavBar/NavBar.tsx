@@ -1,4 +1,5 @@
 import { useUIStore } from '@/stores/uiStore';
+import { logger } from '@/utils/Logger';
 import './NavBar.css';
 
 const NAV_ITEMS = [
@@ -21,7 +22,10 @@ export function NavBar() {
         <button
           key={item.id}
           className={`nav-bar__item ${activePanel === item.id ? 'nav-bar__item--active' : ''}`}
-          onClick={() => togglePanel(item.id)}
+          onClick={() => {
+            logger.info('app', `👆 导航: ${item.label}`);
+            togglePanel(item.id);
+          }}
         >
           <span className="nav-bar__icon">{item.icon}</span>
           <span className="nav-bar__label">{item.label}</span>
