@@ -179,6 +179,7 @@ export class CraftingSystem {
    */
   private onCraftStart(data: { recipeId: string; stationId: string }): void {
     const { recipeId, stationId } = data;
+    console.log(`[CraftingSystem] craft:start received — recipeId=${recipeId} stationId=${stationId} slots=${this.tasks.size}/${this.maxSlots}`);
 
     // 检查槽位
     if (this.tasks.size >= this.maxSlots) {
@@ -248,6 +249,7 @@ export class CraftingSystem {
 
       // 检查是否完成
       if (task.progress >= 100) {
+        console.log(`[CraftingSystem] ✅ 制作完成 recipeId=${task.recipeId} taskId=${taskId}`);
         completedTaskIds.push(taskId);
       }
     }
