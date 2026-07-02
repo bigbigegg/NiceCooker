@@ -1,52 +1,48 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { StatusBar } from '@/ui/components/StatusBar/StatusBar';
 import { NavBar } from '@/ui/components/NavBar/NavBar';
 import { GameCanvas } from '@/ui/GameCanvas';
+import { useUIStore } from '@/stores/uiStore';
+import { useTimeStore } from '@/stores/timeStore';
 import { gameLoop } from '@/core/GameLoop';
 import { eventBus } from '@/core/EventBus';
-import { useTimeStore } from '@/stores/timeStore';
+import { customerSystem } from '@/core/systems/customer/CustomerSystem';
+import { useRecipeStore } from '@/stores/recipeStore';
 import type { GameTime } from '@/types';
 import './App.css';
 
 export function App() {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const isLoading = useUIStore((s) => s.isLoading);
+  const setLoading = useUIStore((s) => s.setLoading);
 
   useEffect(() => {
-    try {
-      // 同步时间到 UI（仅当时分变化，避免每帧渲染）
-      let lastDisplay = '';
-      eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
-        const display = `${time.hour}:${time.minute}`;
-        if (display !== lastDisplay) {
-          lastDisplay = display;
-          useTimeStore.getState().setTime(time);
-        }
-      });
+    // 初始化配方 Store
+    useRecipeStore.getState().init();
+    // 启动顾客系统
+    customerSystem.start();
+    // 启动时间循环
+    gameLoop.start();
 
-      // 启动游戏主循环（仅更新时间，系统注册由各模块自行负责）
-      gameLoop.start();
-      setReady(true);
-    } catch (e) {
-      setError(String(e));
-    }
+    // 同步时间到 UI（节流：仅当时分变化）
+    let lastDisplay = '';
+    eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
+      const display = `${time.hour}:${time.minute}`;
+      if (display !== lastDisplay) {
+        lastDisplay = display;
+        useTimeStore.getState().setTime(time);
+      }
+    });
+
+    setLoading(false);
 
     return () => {
       gameLoop.stop();
+      customerSystem.stop();
     };
-  }, []);
+  }, [setLoading]);
 
-  if (error) {
-    return (
-      <div style={{ padding: 40, color: 'red', fontFamily: 'monospace' }}>
-        <h2>启动失败</h2>
-        <pre>{error}</pre>
-      </div>
-    );
-  }
-
-  if (!ready) {
+  if (isLoading) {
     return (
       <div className="loading-screen">
         <div className="loading-logo">☕</div>
