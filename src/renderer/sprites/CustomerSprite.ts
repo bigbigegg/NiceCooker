@@ -218,7 +218,7 @@ export class CustomerSprite extends Container {
     // 状态文字（细化 waiting 状态）
     let label: string;
     if (state === 'waiting') {
-      const isCrafting = useCraftingStore.getState().activeCustomerId === this.customerId;
+      const isCrafting = useCraftingStore.getState().isCrafting(this.customerId);
       label = isCrafting ? '🔨 制作中' : '📋 待接单';
     } else {
       const stateLabels: Record<string, string> = {

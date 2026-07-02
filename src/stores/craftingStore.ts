@@ -1,37 +1,55 @@
 import { create } from 'zustand';
 
 interface CraftingState {
-  /** 正在制作的顾客 ID（null = 无制作任务） */
-  activeCustomerId: string | null;
-  /** 制作进度 0-100 */
+  /** 正在制作的顾客 ID 列表（支持多槽位） */
+  activeCustomerIds: string[];
+  /** 制作进度 0-100（最后更新的任务进度） */
   progress: number;
   /** 制作结果文本 */
   result: string | null;
 
-  startCrafting: (customerId: string) => void;
+  addCrafting: (customerId: string) => void;
+  removeCrafting: (customerId: string) => void;
   setProgress: (progress: number) => void;
-  completeCrafting: (result: string) => void;
+  completeCrafting: (customerId: string, result: string) => void;
   reset: () => void;
   clearResult: () => void;
+  isCrafting: (customerId: string) => boolean;
 }
 
 /**
  * 制作进度 Store
- *
- * 独立于 React 组件生命周期，OrderPanel 关闭/重开不会丢失状态。
  */
-export const useCraftingStore = create<CraftingState>((set) => ({
-  activeCustomerId: null,
+export const useCraftingStore = create<CraftingState>((set, get) => ({
+  activeCustomerIds: [],
   progress: 0,
   result: null,
 
-  startCrafting: (customerId) =>
-    set({ activeCustomerId: customerId, progress: 0, result: null }),
+  addCrafting: (customerId) =>
+    set((s) => ({
+      activeCustomerIds: s.activeCustomerIds.includes(customerId)
+        ? s.activeCustomerIds
+        : [...s.activeCustomerIds, customerId],
+      progress: 0,
+      result: null,
+    })),
+
+  removeCrafting: (customerId) =>
+    set((s) => ({
+      activeCustomerIds: s.activeCustomerIds.filter((id) => id !== customerId),
+    })),
 
   setProgress: (progress) => set({ progress }),
 
-  completeCrafting: (result) => set({ result, progress: 100 }),
+  completeCrafting: (customerId, result) =>
+    set((s) => ({
+      result,
+      progress: 100,
+      activeCustomerIds: s.activeCustomerIds.filter((id) => id !== customerId),
+    })),
 
-  reset: () => set({ activeCustomerId: null, progress: 0, result: null }),
+  reset: () => set({ activeCustomerIds: [], progress: 0, result: null }),
   clearResult: () => set({ result: null }),
+
+  isCrafting: (customerId) => get().activeCustomerIds.includes(customerId),
 }));

@@ -44,33 +44,30 @@ export function App() {
       },
     );
 
-    // 制作完成 → 自动服务 + 结算（不直接写 craftingStore，由 OrderPanel 按需读取）
+    // 制作完成 → 自动服务 + 结算
     const unsubCraftComplete = eventBus.on<{ recipeId: string; quality: number }>(
       'craft:complete',
       (data) => {
         const quality = Math.floor(data.quality);
         const stars = quality >= 85 ? 5 : quality >= 65 ? 4 : quality >= 45 ? 3 : quality >= 25 ? 2 : 1;
         const recipe = RECIPES_BY_ID.get(data.recipeId);
-        const cStore = useCraftingStore.getState();
         const resultText = `✅ ${recipe?.name ?? ''} 完成！品质: ${'⭐'.repeat(stars)}`;
-        // 仅在结果属于当前制作的顾客时更新 store
-        if (cStore.activeCustomerId) {
-          cStore.completeCrafting(resultText);
-        }
         logger.info('craft', resultText, { recipeId: data.recipeId, quality, stars });
 
-        // 自动服务
-        const customerId = cStore.activeCustomerId;
-        if (customerId) {
-          const customer = useCustomerStore.getState().customers[customerId];
-          if (customer?.state === 'waiting') {
-            useCustomerStore.getState().markServed(customerId, quality);
-            const multiplier = [0, 0.7, 0.8, 0.9, 1.2, 1.5][stars] ?? 1;
-            const earned = Math.round((recipe?.basePrice ?? 30) * multiplier);
-            usePlayerStore.getState().earnGold(earned, 'service');
-            usePlayerStore.getState().addExp(recipe?.baseExp ?? 12);
-            logger.info('economy', `💰 金币 +${earned} (${recipe?.name} ${stars}星) | EXP +${recipe?.baseExp ?? 12} | customer=${customerId}`);
-          }
+        // 自动服务：找第一个等待中且点了同一菜品的顾客
+        const customers = useCustomerStore.getState().customers;
+        const serveCustomerId = Object.values(customers).find(
+          (c) => c.state === 'waiting' && c.orderRecipeId === data.recipeId,
+        )?.id;
+
+        if (serveCustomerId) {
+          useCustomerStore.getState().markServed(serveCustomerId, quality);
+          const multiplier = [0, 0.7, 0.8, 0.9, 1.2, 1.5][stars] ?? 1;
+          const earned = Math.round((recipe?.basePrice ?? 30) * multiplier);
+          usePlayerStore.getState().earnGold(earned, 'service');
+          usePlayerStore.getState().addExp(recipe?.baseExp ?? 12);
+          useCraftingStore.getState().completeCrafting(serveCustomerId, resultText);
+          logger.info('economy', `💰 金币 +${earned} (${recipe?.name} ${stars}星) | EXP +${recipe?.baseExp ?? 12} | customer=${serveCustomerId}`);
         }
       },
     );

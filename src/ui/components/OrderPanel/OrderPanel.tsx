@@ -21,7 +21,7 @@ export function OrderPanel() {
     const unsubClick = eventBus.on<OrderInfo>('customer:click', (info) => {
       logger.info('app', `👆 点击顾客 id=${info.customerId} type=${info.typeId} state=${info.state} recipe=${info.orderRecipeId ?? '无'}`);
       setOrder(info);
-      if (info.customerId !== useCraftingStore.getState().activeCustomerId) {
+      if (!useCraftingStore.getState().isCrafting(info.customerId)) {
         useCraftingStore.getState().clearResult();
       }
     });
@@ -32,14 +32,14 @@ export function OrderPanel() {
   if (!order) return null;
 
   const recipe = order.orderRecipeId ? RECIPES_BY_ID.get(order.orderRecipeId) : null;
-  const isCrafting = crafting.activeCustomerId === order.customerId;
+  const isCrafting = crafting.isCrafting(order.customerId);
 
   const handleCraft = () => {
     if (!recipe) return;
     const ok = useRecipeStore.getState().startCrafting(recipe.id, 'coffee_machine');
     if (ok) {
       logger.info('app', `🔨 开始制作 ${recipe.name} for customer=${order.customerId}`);
-      crafting.startCrafting(order.customerId);
+      crafting.addCrafting(order.customerId);
     } else {
       // 槽位已满，不更新 result（保留之前的完成信息）
       logger.warn('app', `⏳ 制作队列已满 for customer=${order.customerId}`);
