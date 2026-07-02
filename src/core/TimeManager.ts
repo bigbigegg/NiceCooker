@@ -80,14 +80,6 @@ export class TimeManager {
     const minute = totalGameMinutes % 60;
     const phase = TimeManager.hourToPhase(hour);
 
-    // 每秒一次日志
-    const prevSecond = Math.floor((this._totalGameSeconds - deltaSeconds * this._gameTime.speed * 120) % 60);
-    if (Math.floor(this._totalGameSeconds % 60) !== Math.floor(prevSecond)) {
-      console.log('[TimeManager] totalGameSeconds:', Math.floor(this._totalGameSeconds),
-        `→ Day${day} ${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`,
-        'phase:', phase);
-    }
-
     // 阶段变化
     if (phase !== this._gameTime.phase) {
       const prevPhase = this._gameTime.phase;

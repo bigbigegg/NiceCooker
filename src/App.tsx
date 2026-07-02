@@ -24,16 +24,9 @@ export function App() {
     // 启动时间循环
     gameLoop.start();
 
-    // 同步时间到 UI（节流：仅当时分变化）
-    let lastDisplay = '';
+    // 同步时间到 UI（每帧同步，Zustand 浅比较自动跳过未变化的状态）
     const unsubTime = eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
-      const display = `${time.hour}:${time.minute}`;
-      console.log('[App] time:tick — raw:', time.hour, time.minute, 'display:', display, 'last:', lastDisplay);
-      if (display !== lastDisplay) {
-        lastDisplay = display;
-        console.log('[App] → updating timeStore to', display);
-        useTimeStore.getState().setTime(time);
-      }
+      useTimeStore.getState().setTime(time);
     });
 
     setLoading(false);

@@ -47,3 +47,17 @@
   color: #AED581;
   font-weight: 600;
 }
+
+.status-bar__speed {
+  background: var(--color-brown-700);
+  color: var(--color-gold);
+  border: 1px solid var(--color-brown-600);
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.status-bar__speed:hover {
+  background: var(--color-brown-600);
+}
