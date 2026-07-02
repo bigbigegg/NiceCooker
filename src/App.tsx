@@ -43,20 +43,23 @@ export function App() {
       },
     );
 
-    // 制作完成 → craftingStore + 自动服务 + 结算
+    // 制作完成 → 自动服务 + 结算（不直接写 craftingStore，由 OrderPanel 按需读取）
     const unsubCraftComplete = eventBus.on<{ recipeId: string; quality: number }>(
       'craft:complete',
       (data) => {
         const quality = Math.floor(data.quality);
         const stars = quality >= 85 ? 5 : quality >= 65 ? 4 : quality >= 45 ? 3 : quality >= 25 ? 2 : 1;
         const recipe = RECIPES_BY_ID.get(data.recipeId);
-        const store = useCraftingStore.getState();
+        const cStore = useCraftingStore.getState();
         const resultText = `✅ ${recipe?.name ?? ''} 完成！品质: ${'⭐'.repeat(stars)}`;
-        store.completeCrafting(resultText);
+        // 仅在结果属于当前制作的顾客时更新 store
+        if (cStore.activeCustomerId) {
+          cStore.completeCrafting(resultText);
+        }
         logger.info('craft', resultText, { recipeId: data.recipeId, quality, stars });
 
         // 自动服务
-        const customerId = store.activeCustomerId;
+        const customerId = cStore.activeCustomerId;
         if (customerId) {
           const customer = useCustomerStore.getState().customers[customerId];
           if (customer?.state === 'waiting') {

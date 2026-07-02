@@ -31,16 +31,12 @@ export function OrderPanel() {
 
   const handleCraft = () => {
     if (!recipe) return;
-    const store = useRecipeStore.getState();
-    console.log(`[OrderPanel] startCrafting — recipe=${recipe.id} unlocked=${store.isUnlocked(recipe.id)}`);
-    const ok = store.startCrafting(recipe.id, 'coffee_machine');
-    console.log(`[OrderPanel] startCrafting result=${ok}`);
+    const ok = useRecipeStore.getState().startCrafting(recipe.id, 'coffee_machine');
     if (ok) {
       logger.info('app', `🔨 开始制作 ${recipe.name} for customer=${order.customerId}`);
       crafting.startCrafting(order.customerId);
     } else {
-      const slots = store.getAvailableSlots?.() ?? 0;
-      setCraftResult(slots <= 0 ? '⏳ 制作队列已满，请等待...' : '❌ 制作失败');
+      setCraftResult('⏳ 制作队列已满，请等待...');
     }
   };
 
