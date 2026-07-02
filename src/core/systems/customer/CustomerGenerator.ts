@@ -32,26 +32,24 @@ function generateCustomerId(): string {
  * ```
  */
 export class CustomerGenerator {
-  /** 上次检查的游戏小时 */
-  private lastCheckedHour = -1;
+  /** 上次检查的时间标识（hour*2 + (minute>=30?1:0)） */
+  private lastCheckSlot = -1;
 
   /**
-   * 每帧调用，检查是否需要生成顾客
-   *
-   * @returns 本帧新生成的顾客实例列表
+   * 每帧调用，每 30 游戏分钟检查一次并生成顾客
    */
   update(): CustomerInstance[] {
     const timeState = useTimeStore.getState();
-    const currentHour = timeState.time.hour;
+    const { hour, minute } = timeState.time;
+    const slot = hour * 2 + (minute >= 30 ? 1 : 0);
 
-    // 只在游戏小时变化时检查一次
-    if (currentHour === this.lastCheckedHour) return [];
-    this.lastCheckedHour = currentHour;
+    if (slot === this.lastCheckSlot) return [];
+    this.lastCheckSlot = slot;
 
-    // 非营业时间不生成
     if (!timeState.isBusinessHours) return [];
 
-    const expectedCount = this.calculateCustomerCount();
+    // 每半小时生成一半客流（总数/2，四舍五入）
+    const expectedCount = this.calculateCustomerCount() / 2;
     if (expectedCount <= 0) return [];
 
     const actualCount = Math.max(1, Math.round(expectedCount));
@@ -81,7 +79,7 @@ export class CustomerGenerator {
     const trafficMultiplier = PHASE_TRAFFIC_MULTIPLIER[phase] ?? 0;
 
     // 基础值
-    const base = 1.5;
+    const base = 4.0;
 
     // 时段系数
     const phaseFactor = trafficMultiplier;
