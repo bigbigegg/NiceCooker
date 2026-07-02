@@ -1,109 +1,72 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import { Application } from 'pixi.js';
-import { SceneManager } from '@/renderer/SceneManager';
-import { RenderSystem } from '@/renderer/systems/RenderSystem';
-import { eventBus } from '@/core/EventBus';
 
 interface GameCanvasProps {
   containerRef: RefObject<HTMLDivElement | null>;
 }
 
-/** 全局场景管理器实例（供其他模块引用） */
-export let sceneManager: SceneManager | null = null;
-
-/** 全局渲染系统实例（供其他模块引用） */
-export let renderSystem: RenderSystem | null = null;
-
 /**
- * PixiJS 画布挂载点
- *
- * 将 PixiJS Application 挂载到 DOM 容器中，
- * 使用 ResizeObserver 手动处理画布尺寸（避免 PixiJS 8 resizeTo 的 _cancelResize bug）
+ * PixiJS 画布 — 简化版
+ * 使用 fixed size，避免 resize 问题
  */
 export function GameCanvas({ containerRef }: GameCanvasProps) {
   const appRef = useRef<Application | null>(null);
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const [webglError, setWebglError] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || appRef.current) return;
 
-    const app = new Application();
-    appRef.current = app;
+    let cancelled = false;
 
-    app.init({
-      width: container.clientWidth,
-      height: container.clientHeight,
-      background: '#EFEBE9',
-      antialias: true,
-      resolution: window.devicePixelRatio || 1,
-      autoDensity: true,
-    }).then(() => {
-      container.appendChild(app.canvas as HTMLCanvasElement);
-      const canvas = app.canvas as HTMLCanvasElement;
-      canvas.style.position = 'absolute';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
+    const initPixi = async () => {
+      try {
+        const app = new Application();
+        await app.init({
+          width: container.clientWidth || 800,
+          height: container.clientHeight || 600,
+          background: '#EFEBE9',
+          antialias: false,
+          resolution: 1,
+        });
 
-      // 手动监听容器尺寸变化（防抖避免循环触发）
-      let resizeTimer: ReturnType<typeof setTimeout>;
-      const observer = new ResizeObserver(() => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          const w = container.clientWidth;
-          const h = container.clientHeight;
-          if (w > 0 && h > 0 && (app.renderer.width !== w || app.renderer.height !== h)) {
-            app.renderer.resize(w, h);
-          }
-        }, 100);
-      });
-      observer.observe(container);
-      resizeObserverRef.current = observer;
+        if (cancelled) {
+          app.destroy(true);
+          return;
+        }
 
-      // 初始化场景管理器
-      if (!sceneManager) {
-        sceneManager = new SceneManager();
+        appRef.current = app;
+        container.appendChild(app.canvas as HTMLCanvasElement);
+        (app.canvas as HTMLCanvasElement).style.display = 'block';
+      } catch {
+        setWebglError(true);
       }
-      sceneManager.init(app);
+    };
 
-      // 初始化渲染系统
-      if (!renderSystem) {
-        renderSystem = new RenderSystem(sceneManager);
-      }
-      renderSystem.init(app);
-
-      // 通过事件总线通知渲染系统已就绪
-      eventBus.emit('renderer:ready', { sceneManager, renderSystem });
-    });
+    initPixi();
 
     return () => {
-      // 停止 resize 监听
-      if (resizeObserverRef.current) {
-        resizeObserverRef.current.disconnect();
-        resizeObserverRef.current = null;
+      cancelled = true;
+      if (appRef.current) {
+        try { appRef.current.destroy(true); } catch { /* PixiJS 8 清理异常 */ }
+        appRef.current = null;
       }
-
-      // 清理渲染系统
-      if (renderSystem) {
-        renderSystem.destroy();
-        renderSystem = null;
-      }
-
-      // 清理场景管理器
-      if (sceneManager) {
-        sceneManager.destroy();
-        sceneManager = null;
-      }
-
-      // 销毁 PixiJS Application（PixiJS 8 resizeTo 有 _cancelResize bug，手动 resize 避开）
-      try {
-        app.destroy(true);
-      } catch {
-        // PixiJS 8 内部清理偶发异常，静默处理
-      }
-      appRef.current = null;
     };
   }, [containerRef]);
+
+  if (webglError) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        height: '100%', color: '#8D6E63', fontSize: 14,
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>☕</div>
+          <p>WebGL 不可用，请使用支持 WebGL 的浏览器</p>
+        </div>
+      </div>
+    );
+  }
 
   return null;
 }
