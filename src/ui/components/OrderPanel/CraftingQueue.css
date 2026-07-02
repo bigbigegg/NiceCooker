@@ -1,0 +1,49 @@
+.crafting-queue {
+  background: var(--color-cream);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 8px;
+}
+
+.crafting-queue__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brown-700);
+  margin-bottom: 6px;
+}
+
+.crafting-queue__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.crafting-queue__name {
+  font-size: 11px;
+  color: var(--color-text);
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.crafting-queue__bar {
+  flex: 1;
+  height: 4px;
+  background: var(--color-brown-200);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.crafting-queue__fill {
+  height: 100%;
+  background: var(--color-brown-600);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.crafting-queue__pct {
+  font-size: 10px;
+  color: var(--color-text-light);
+  width: 28px;
+  text-align: right;
+}
