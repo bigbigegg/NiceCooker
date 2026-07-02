@@ -8,6 +8,10 @@ import { gameLoop } from '@/core/GameLoop';
 import { eventBus } from '@/core/EventBus';
 import { customerSystem } from '@/core/systems/customer/CustomerSystem';
 import { useRecipeStore } from '@/stores/recipeStore';
+import { useCraftingStore } from '@/stores/craftingStore';
+import { usePlayerStore } from '@/stores/playerStore';
+import { useCustomerStore } from '@/stores/customerStore';
+import { RECIPES_BY_ID } from '@/config/recipes';
 import { OrderPanel } from '@/ui/components/OrderPanel/OrderPanel';
 import type { GameTime } from '@/types';
 import './App.css';
@@ -26,11 +30,39 @@ export function App() {
     gameLoop.start();
 
     // 同步时间到 UI
-    // 注意：TimeManager 返回的是同一对象引用（in-place 更新），
-    // 必须浅拷贝创建新对象，Zustand 才能检测到变化并触发重渲染。
     const unsubTime = eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
       useTimeStore.getState().setTime({ ...time });
     });
+
+    // 制作进度 → craftingStore
+    const unsubCraftProgress = eventBus.on<{ recipeId: string; progress: number }>(
+      'craft:progress',
+      (data) => useCraftingStore.getState().setProgress(Math.round(data.progress)),
+    );
+
+    // 制作完成 → craftingStore + 自动服务 + 结算
+    const unsubCraftComplete = eventBus.on<{ recipeId: string; quality: number }>(
+      'craft:complete',
+      (data) => {
+        const quality = Math.floor(data.quality);
+        const stars = quality >= 85 ? 5 : quality >= 65 ? 4 : quality >= 45 ? 3 : quality >= 25 ? 2 : 1;
+        const recipe = RECIPES_BY_ID.get(data.recipeId);
+        const store = useCraftingStore.getState();
+        store.completeCrafting(`✅ ${recipe?.name ?? ''} 完成！品质: ${'⭐'.repeat(stars)}`);
+
+        // 自动服务
+        const customerId = store.activeCustomerId;
+        if (customerId) {
+          const customer = useCustomerStore.getState().customers[customerId];
+          if (customer?.state === 'waiting') {
+            useCustomerStore.getState().markServed(customerId, quality);
+            const multiplier = [0, 0.7, 0.8, 0.9, 1.2, 1.5][stars] ?? 1;
+            usePlayerStore.getState().earnGold(Math.round((recipe?.basePrice ?? 30) * multiplier), 'service');
+            usePlayerStore.getState().addExp(recipe?.baseExp ?? 12);
+          }
+        }
+      },
+    );
 
     setLoading(false);
 
@@ -38,6 +70,8 @@ export function App() {
       gameLoop.stop();
       customerSystem.stop();
       unsubTime();
+      unsubCraftProgress();
+      unsubCraftComplete();
     };
   }, [setLoading]);
 
