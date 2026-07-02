@@ -15,11 +15,10 @@
 7. [TypeScript 规范](#7-typescript-规范)
 8. [React 组件规范](#8-react-组件规范)
 9. [游戏模块规范](#9-游戏模块规范)
-10. [测试规范](#10-测试规范)
-11. [Code Review 规范](#11-code-review-规范)
-12. [文档规范](#12-文档规范)
-13. [CI/CD 规范](#13-cicd-规范)
-14. [数值配置规范](#14-数值配置规范)
+10. [Code Review 规范](#10-code-review-规范)
+11. [文档规范](#11-文档规范)
+12. [CI/CD 规范](#12-cicd-规范)
+13. [数值配置规范](#13-数值配置规范)
 
 ---
 
@@ -109,7 +108,7 @@ git push origin --delete feature/<任务编号>-<简短描述>
 | `refactor` | 代码重构 |
 | `style` | 代码格式（空格、分号等，不影响逻辑） |
 | `docs` | 文档变更 |
-| `test` | 添加或修改测试 |
+
 | `chore` | 构建/工具/依赖变更 |
 | `perf` | 性能优化 |
 
@@ -256,7 +255,7 @@ function sortByDepth(entities: Entity[]): Entity[] {
 | 工具函数 | camelCase | `calculatePrice.ts` |
 | 类型定义 | PascalCase | `Customer.ts`, `index.ts` |
 | 常量/配置 | camelCase | `economyConfig.ts` |
-| 测试文件 | 同源文件 + `.test.ts` | `customerStore.test.ts` |
+
 | 样式文件 | 同源文件 + `.module.css` | `StatusBar.module.css` |
 
 ### 5.2 变量命名
@@ -398,10 +397,7 @@ NiceCooker/
 │   ├── main.tsx
 │   └── vite-env.d.ts
 │
-├── tests/                    # E2E / 集成测试
-│   ├── e2e/
-│   └── integration/
-│
+
 ├── docs/                     # 设计文档（已存在）
 ├── .editorconfig
 ├── .gitignore
@@ -415,7 +411,7 @@ NiceCooker/
 
 ### 6.2 文件组织原则
 
-1. **就近原则**：测试文件和样式文件放在被测试/被样式文件的同级目录
+1. **就近原则**：样式文件放在同级目录
 2. **桶导出**：每个目录有 `index.ts`，统一导出
 3. **单入口**：`core/` 不引用 `renderer/` 和 `ui/`；`renderer/` 不引用 `ui/`
 4. **配置分离**：所有数值放在 `config/`，不与逻辑代码混在一起
@@ -618,66 +614,11 @@ export const RECIPES: Record<string, RecipeConfig> = {
 
 ---
 
-## 10. 测试规范
-
-### 10.1 测试金字塔
-
-```
-          ╱  E2E  ╲        5%  — Playwright，关键流程
-         ╱ 集成测试 ╲      15% — Vitest + React Testing Library
-        ╱  单元测试  ╲     80% — Vitest，纯逻辑函数
-```
-
-### 10.2 测试文件组织
-
-```
-src/
-├── core/
-│   ├── GameLoop.ts
-│   └── __tests__/
-│       └── GameLoop.test.ts       # 单元测试
-├── stores/
-│   ├── customerStore.ts
-│   └── __tests__/
-│       └── customerStore.test.ts
-tests/
-├── integration/
-│   └── customer-flow.test.ts       # 顾客完整流程
-└── e2e/
-    └── full-day.test.ts            # 完整一游戏天
-```
-
-### 10.3 测试命名
-
-```typescript
-describe('CustomerStateMachine', () => {
-  describe('transition', () => {
-    it('should transition from Entering to Ordering when seat is assigned', () => {});
-    it('should transition from Waiting to Leaving when patience reaches zero', () => {});
-    it('should NOT transition to Eating when order is not ready', () => {});
-  });
-});
-
-// 命名模式: it('should <行为> when <条件>', ...)
-// 否定测试: it('should NOT <行为> when <条件>', ...)
-```
-
-### 10.4 覆盖率目标
-
-| 类别 | 最低覆盖率 |
-|------|----------|
-| `core/`（游戏逻辑） | ≥ 80% |
-| `stores/`（状态管理） | ≥ 70% |
-| `ui/components/` | ≥ 50% |
-| `renderer/` | ≥ 30%（以 E2E 补充） |
-
----
-
-## 11. Code Review 规范
+## 10. Code Review 规范
 
 ### 11.1 PR 要求
 
-- PR 描述必须包含：做了什么、为什么这样做、如何测试
+- PR 描述必须包含：做了什么、为什么这样做
 - PR 关联对应的 Sprint-Plan 任务 ID
 - 单次 PR 变更 ≤ 400 行（超出需拆分）
 - CI 全部通过后才能请求 Review
@@ -690,7 +631,6 @@ describe('CustomerStateMachine', () => {
 □ 可读性：命名清晰、注释合理、无过度抽象
 □ 一致性：遵循本文档的命名/风格/结构规范
 □ 安全性：无 XSS 风险、用户输入校验
-□ 测试：核心逻辑有对应测试
 ```
 
 ### 11.3 Review 礼仪
@@ -708,7 +648,7 @@ todo: 当前可以合入，但需要后续跟进
 
 ---
 
-## 12. 文档规范
+## 11. 文档规范
 
 ### 12.1 文档存放位置
 
@@ -729,7 +669,7 @@ todo: 当前可以合入，但需要后续跟进
 
 ---
 
-## 13. CI/CD 规范
+## 12. CI/CD 规范
 
 ### 13.1 CI 流程
 
@@ -740,7 +680,6 @@ on: [push, pull_request]
 jobs:
   lint:       # ESLint + Prettier 检查
   typecheck:  # tsc --noEmit
-  test:       # vitest --coverage
   build:      # vite build（确认可构建）
 ```
 
@@ -750,13 +689,11 @@ jobs:
 |--------|------|-----------|
 | ESLint errors | 0 | 阻止合入 |
 | TypeScript errors | 0 | 阻止合入 |
-| 单元测试通过率 | 100% | 阻止合入 |
-| 核心逻辑覆盖率 | ≥ 80% | 警告（MVP 阶段不阻止） |
 | 包体积 | ≤ 500KB（gzip） | 警告 |
 
 ---
 
-## 14. 数值配置规范
+## 13. 数值配置规范
 
 ### 14.1 配置与逻辑分离
 
@@ -817,7 +754,6 @@ export const CUSTOMER_CONFIG = {
 - ESLint
 - Prettier
 - Pretty TypeScript Errors
-- Vitest
 - GitLens
 
 ### B. 推荐 VS Code 设置
@@ -844,8 +780,6 @@ pnpm dev                  # 启动开发服务器
 pnpm lint                 # ESLint 检查
 pnpm lint:fix             # ESLint 自动修复
 pnpm typecheck            # TypeScript 类型检查
-pnpm test                 # 运行单元测试
-pnpm test:coverage        # 运行测试 + 覆盖率报告
 
 # 构建
 pnpm build                # 生产构建
