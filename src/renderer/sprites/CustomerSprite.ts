@@ -85,13 +85,11 @@ export class CustomerSprite extends Container {
     this.y = position.y;
     this.alpha = 0;
 
-    // 点击交互（实时从 store 读取最新数据）
+    // 点击交互（仅在角色区域内响应）
     this.eventMode = 'static';
     this.cursor = 'pointer';
-    // 扩大点击区域 + 确保不被子元素拦截
-    this.hitArea = { contains: (_x, _y) => true };
-    this.on('pointerdown', (e) => {
-      e.stopPropagation();
+    this.hitArea = { contains: (x, y) => x >= -18 && x <= 18 && y >= -40 && y <= 25 };
+    this.on('pointerdown', () => {
       const latest = useCustomerStore.getState().customers[this.customerId];
       if (latest) {
         eventBus.emit('customer:click', {
