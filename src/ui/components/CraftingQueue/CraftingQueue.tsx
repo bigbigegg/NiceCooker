@@ -50,16 +50,22 @@ export function CraftingQueue() {
     return () => { unsubStart(); unsubProgress(); unsubComplete(); };
   }, []);
 
-  if (queue.length === 0 && collapsed) return null;
+  if (queue.length === 0) return null;
 
   return (
     <div className={`crafting-queue ${collapsed ? 'crafting-queue--collapsed' : ''}`}>
+      {/* 折叠时显示边缘标签 */}
+      {collapsed && (
+        <div className="crafting-queue__tab" onClick={() => setCollapsed(false)} title="展开制作队列">
+          🔨 {queue.length}
+        </div>
+      )}
       <div className="crafting-queue__header" onClick={() => setCollapsed(!collapsed)}>
         <span>🔨 制作队列 ({queue.length})</span>
         <span className="crafting-queue__toggle">{collapsed ? '▶' : '▼'}</span>
       </div>
+      {!collapsed && (
 
-      {!collapsed && queue.length > 0 && (
         <div className="crafting-queue__body">
           {queue.map((item) => {
             const recipe = RECIPES_BY_ID.get(item.recipeId);
@@ -74,10 +80,6 @@ export function CraftingQueue() {
             );
           })}
         </div>
-      )}
-
-      {!collapsed && queue.length === 0 && (
-        <div className="crafting-queue__empty">队列为空</div>
       )}
     </div>
   );

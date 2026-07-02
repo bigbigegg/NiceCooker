@@ -14,6 +14,24 @@
   width: auto;
 }
 
+.crafting-queue__tab {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  background: #5D4037;
+  color: #FFD54F;
+  padding: 4px 10px;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.crafting-queue__tab:hover {
+  background: #795548;
+}
+
 .crafting-queue__header {
   display: flex;
   justify-content: space-between;
