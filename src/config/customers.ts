@@ -23,7 +23,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     patience: 60,
     spendingPower: 1.0,
     tipRate: 0.05,
-    preferences: ['C02', 'C03']  // 美式、拿铁,
+    preferences: ['C02', 'C03'], // 美式、拿铁
     appearTimes: ['07-09', '12-13'],
     speedSensitivity: 0.9,
     qualitySensitivity: 0.3,
@@ -39,7 +39,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     patience: 180,
     spendingPower: 0.7,
     tipRate: CUSTOMER_DEFAULTS.tipRate,
-    preferences: ['C05', 'dessert']  // 摩卡、甜品,
+    preferences: ['C05', 'dessert'], // 摩卡、甜品
     appearTimes: ['14-18'],
     speedSensitivity: CUSTOMER_DEFAULTS.speedSensitivity,
     qualitySensitivity: CUSTOMER_DEFAULTS.qualitySensitivity,
@@ -55,7 +55,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     patience: 300,
     spendingPower: 0.9,
     tipRate: CUSTOMER_DEFAULTS.tipRate,
-    preferences: ['coffee']  // 经典咖啡,
+    preferences: ['coffee'], // 经典咖啡
     appearTimes: ['all'],
     speedSensitivity: CUSTOMER_DEFAULTS.speedSensitivity,
     qualitySensitivity: CUSTOMER_DEFAULTS.qualitySensitivity,
@@ -71,7 +71,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     patience: 120,
     spendingPower: 1.3,
     tipRate: CUSTOMER_DEFAULTS.tipRate,
-    preferences: ['coffee']  // 特调（MVP用咖啡代替）,
+    preferences: ['coffee'], // 特调（MVP用咖啡代替）
     appearTimes: ['14-17'],
     speedSensitivity: CUSTOMER_DEFAULTS.speedSensitivity,
     qualitySensitivity: 0.7,
@@ -87,7 +87,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     patience: 90,
     spendingPower: 1.5,
     tipRate: CUSTOMER_DEFAULTS.tipRate,
-    preferences: ['C01', 'coffee']  // 单品,
+    preferences: ['C01', 'coffee'], // 单品
     appearTimes: ['all'],
     speedSensitivity: 0.7,
     qualitySensitivity: 0.9,
@@ -103,7 +103,7 @@ export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {
     patience: 200,
     spendingPower: 1.1,
     tipRate: 0.25,
-    preferences: ['cold_drink']  // 冷萃（MVP用冷饮代替）,
+    preferences: ['cold_drink'], // 冷萃（MVP用冷饮代替）
     appearTimes: ['all'],
     speedSensitivity: CUSTOMER_DEFAULTS.speedSensitivity,
     qualitySensitivity: 0.8,
