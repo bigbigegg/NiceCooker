@@ -1,6 +1,7 @@
 import { usePlayerStore } from '@/stores/playerStore';
 import { useTimeStore } from '@/stores/timeStore';
 import { gameLoop } from '@/core/GameLoop';
+import { logger } from '@/utils/Logger';
 import './StatusBar.css';
 
 const phaseLabel: Record<string, string> = {
@@ -41,6 +42,7 @@ export function StatusBar() {
         <span className="status-bar__gold">🪙 {gold.toLocaleString()}</span>
         <span className="status-bar__diamond">💎 {diamond}</span>
         <span className="status-bar__level">⭐ Lv.{level}</span>
+        <button className="status-bar__log-btn" onClick={() => logger.download()} title="导出日志">📋</button>
       </div>
     </div>
   );

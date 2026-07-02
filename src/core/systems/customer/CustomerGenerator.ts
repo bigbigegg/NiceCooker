@@ -2,6 +2,7 @@ import { eventBus } from '@/core/EventBus';
 import { useTimeStore } from '@/stores/timeStore';
 import { usePlayerStore } from '@/stores/playerStore';
 import { useCustomerStore } from '@/stores/customerStore';
+import { logger } from '@/utils/Logger';
 import {
   CUSTOMER_TYPES,
   CUSTOMER_GLOBAL,
@@ -63,6 +64,9 @@ export class CustomerGenerator {
       }
     }
 
+    if (newCustomers.length > 0) {
+      logger.info('customer', `生成 ${newCustomers.length} 位顾客 (hour=${currentHour})`, newCustomers.map(c => ({ id: c.id, type: c.typeId })));
+    }
     return newCustomers;
   }
 

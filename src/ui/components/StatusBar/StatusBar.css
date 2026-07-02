@@ -61,3 +61,17 @@
 .status-bar__speed:hover {
   background: var(--color-brown-600);
 }
+
+.status-bar__log-btn {
+  background: none;
+  border: 1px solid var(--color-brown-600);
+  border-radius: 4px;
+  color: var(--color-cream);
+  padding: 1px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+.status-bar__log-btn:hover {
+  background: var(--color-brown-700);
+}

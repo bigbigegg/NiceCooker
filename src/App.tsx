@@ -12,6 +12,7 @@ import { useCraftingStore } from '@/stores/craftingStore';
 import { usePlayerStore } from '@/stores/playerStore';
 import { useCustomerStore } from '@/stores/customerStore';
 import { RECIPES_BY_ID } from '@/config/recipes';
+import { logger } from '@/utils/Logger';
 import { OrderPanel } from '@/ui/components/OrderPanel/OrderPanel';
 import type { GameTime } from '@/types';
 import './App.css';
@@ -37,7 +38,9 @@ export function App() {
     // 制作进度 → craftingStore
     const unsubCraftProgress = eventBus.on<{ recipeId: string; progress: number }>(
       'craft:progress',
-      (data) => useCraftingStore.getState().setProgress(Math.round(data.progress)),
+      (data) => {
+        useCraftingStore.getState().setProgress(Math.round(data.progress));
+      },
     );
 
     // 制作完成 → craftingStore + 自动服务 + 结算
@@ -48,7 +51,9 @@ export function App() {
         const stars = quality >= 85 ? 5 : quality >= 65 ? 4 : quality >= 45 ? 3 : quality >= 25 ? 2 : 1;
         const recipe = RECIPES_BY_ID.get(data.recipeId);
         const store = useCraftingStore.getState();
-        store.completeCrafting(`✅ ${recipe?.name ?? ''} 完成！品质: ${'⭐'.repeat(stars)}`);
+        const resultText = `✅ ${recipe?.name ?? ''} 完成！品质: ${'⭐'.repeat(stars)}`;
+        store.completeCrafting(resultText);
+        logger.info('craft', resultText, { recipeId: data.recipeId, quality, stars });
 
         // 自动服务
         const customerId = store.activeCustomerId;
