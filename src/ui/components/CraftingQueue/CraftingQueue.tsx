@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { eventBus } from '@/core/EventBus';
-import { RECIPES_BY_ID } from '@/config/recipes';
+import { RECIPES_BY_ID, MAX_CRAFTING_SLOTS } from '@/config/recipes';
 import './CraftingQueue.css';
 
 interface QueueItem {
@@ -57,11 +57,11 @@ export function CraftingQueue() {
       {/* 折叠时显示边缘标签 */}
       {collapsed && (
         <div className="crafting-queue__tab" onClick={() => setCollapsed(false)} title="展开制作队列">
-          🔨 {queue.length}
+          🔨 {queue.length}/{MAX_CRAFTING_SLOTS}
         </div>
       )}
       <div className="crafting-queue__header" onClick={() => setCollapsed(!collapsed)}>
-        <span>🔨 制作队列 ({queue.length})</span>
+        <span>🔨 制作队列 ({queue.length}/{MAX_CRAFTING_SLOTS})</span>
         <span className="crafting-queue__toggle">{collapsed ? '▶' : '▼'}</span>
       </div>
       {!collapsed && (
