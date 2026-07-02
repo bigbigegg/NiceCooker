@@ -49,6 +49,11 @@ export function GameCanvas({ containerRef }: GameCanvasProps) {
         // 画地板网格
         drawFloor(app);
 
+        // 点击空白处关闭面板（顾客 sprite 已 stopPropagation，不会触发这里）
+        app.stage.eventMode = 'static';
+        app.stage.hitArea = app.renderer.screen;
+        app.stage.on('pointerdown', () => eventBus.emit('order:close', null));
+
         if (!sceneManager) sceneManager = new SceneManager();
         sceneManager.init(app);
         if (!renderSystem) renderSystem = new RenderSystem(sceneManager);

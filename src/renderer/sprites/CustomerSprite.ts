@@ -90,7 +90,8 @@ export class CustomerSprite extends Container {
     this.eventMode = 'static';
     this.cursor = 'pointer';
     this.hitArea = { contains: (x, y) => x >= -18 && x <= 18 && y >= -40 && y <= 25 };
-    this.on('pointerdown', () => {
+    this.on('pointerdown', (e) => {
+      e.stopPropagation(); // 阻止冒泡到 stage（避免触发 order:close）
       const latest = useCustomerStore.getState().customers[this.customerId];
       if (latest) {
         eventBus.emit('customer:click', {
