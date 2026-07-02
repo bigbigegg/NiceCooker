@@ -3,10 +3,11 @@ import { StatusBar } from '@/ui/components/StatusBar/StatusBar';
 import { NavBar } from '@/ui/components/NavBar/NavBar';
 import { GameCanvas } from '@/ui/GameCanvas';
 import { useUIStore } from '@/stores/uiStore';
-import { usePlayerStore } from '@/stores/playerStore';
 import { useTimeStore } from '@/stores/timeStore';
 import { gameLoop } from '@/core/GameLoop';
 import { eventBus } from '@/core/EventBus';
+import { customerSystem } from '@/core/systems/customer/CustomerSystem';
+import { useRecipeStore } from '@/stores/recipeStore';
 import type { GameTime } from '@/types';
 
 import './App.css';
@@ -21,6 +22,12 @@ export function App() {
   const isLoading = useUIStore((s) => s.isLoading);
 
   useEffect(() => {
+    // 初始化配方 Store（加载初始食谱、启动制作系统）
+    useRecipeStore.getState().init();
+
+    // 启动顾客系统（注册到 GameLoop）
+    customerSystem.start();
+
     // 启动游戏主循环
     gameLoop.start();
 
