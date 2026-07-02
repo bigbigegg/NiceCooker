@@ -56,14 +56,14 @@ export class CustomerGenerator {
     const newCustomers: CustomerInstance[] = [];
 
     for (let i = 0; i < actualCount; i++) {
-      const customer = this.createCustomer(currentHour);
+      const customer = this.createCustomer(hour);
       if (customer) {
         newCustomers.push(customer);
       }
     }
 
     if (newCustomers.length > 0) {
-      logger.info('customer', `生成 ${newCustomers.length} 位顾客 (hour=${currentHour})`, newCustomers.map(c => ({ id: c.id, type: c.typeId })));
+      logger.info('customer', `生成 ${newCustomers.length} 位顾客 (hour=${hour})`, newCustomers.map(c => ({ id: c.id, type: c.typeId })));
     }
     return newCustomers;
   }
@@ -99,8 +99,8 @@ export class CustomerGenerator {
   /**
    * 创建单个顾客实例
    */
-  private createCustomer(currentHour: number): CustomerInstance | null {
-    const typeId = this.selectCustomerType(currentHour);
+  private createCustomer(hour: number): CustomerInstance | null {
+    const typeId = this.selectCustomerType(hour);
     if (!typeId) return null;
 
     const config = CUSTOMER_TYPES[typeId];
@@ -132,12 +132,12 @@ export class CustomerGenerator {
   /**
    * 根据当前时段和权重随机选择顾客类型
    */
-  private selectCustomerType(currentHour: number): CustomerTypeId | null {
+  private selectCustomerType(hour: number): CustomerTypeId | null {
     const typeIds = Object.keys(CUSTOMER_TYPES) as CustomerTypeId[];
 
     // 筛选当前小时可出现的类型
     const availableTypes = typeIds.filter((typeId) =>
-      isCustomerAvailableAtHour(CUSTOMER_TYPES[typeId].appearTimes, currentHour),
+      isCustomerAvailableAtHour(CUSTOMER_TYPES[typeId].appearTimes, hour),
     );
 
     if (availableTypes.length === 0) return null;
