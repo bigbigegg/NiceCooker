@@ -5,9 +5,7 @@ interface TimeState {
   time: GameTime;
   isBusinessHours: boolean;
 
-  // Actions
   setTime: (time: GameTime) => void;
-  setBusinessHours: (open: boolean) => void;
 }
 
 export const useTimeStore = create<TimeState>((set) => ({
@@ -21,6 +19,8 @@ export const useTimeStore = create<TimeState>((set) => ({
   },
   isBusinessHours: true,
 
-  setTime: (time) => set({ time }),
-  setBusinessHours: (open) => set({ isBusinessHours: open }),
+  setTime: (time) => set({
+    time,
+    isBusinessHours: time.phase !== 'closed' && time.phase !== 'dawn',
+  }),
 }));

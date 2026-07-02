@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { Application, Graphics, Text } from 'pixi.js';
 import { SceneManager } from '@/renderer/SceneManager';
 import { RenderSystem } from '@/renderer/systems/RenderSystem';
+import { useCustomerStore } from '@/stores/customerStore';
 import { eventBus } from '@/core/EventBus';
 
 interface GameCanvasProps {
@@ -99,4 +100,25 @@ function drawFloor(app: Application) {
   });
   title.x = 16; title.y = 12;
   app.stage.addChild(title);
+
+  // 店内人数计数器（每帧更新）
+  const counter = new Text({
+    text: '👤 店内: 0 人',
+    style: { fontSize: 13, fontFamily: 'PingFang SC, sans-serif', fill: 0x795548 },
+  });
+  counter.x = 16;
+  counter.y = 36;
+  counter.label = 'customer-counter';
+  app.stage.addChild(counter);
+
+  // 用 PixiJS ticker 每秒更新计数器
+  let elapsed = 0;
+  app.ticker.add((ticker) => {
+    elapsed += ticker.deltaMS;
+    if (elapsed >= 1000) {
+      elapsed = 0;
+      const count = Object.keys(useCustomerStore.getState().customers).length;
+      counter.text = `👤 店内: ${count} 人`;
+    }
+  });
 }
