@@ -22,15 +22,23 @@ const TYPE_NAMES: Record<string, string> = {
 export function OrderPanel() {
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [crafting, setCrafting] = useState(false);
+  const [craftProgress, setCraftProgress] = useState(0);
   const [craftResult, setCraftResult] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsub = eventBus.on<OrderInfo>('customer:click', (info) => {
+    const unsubClick = eventBus.on<OrderInfo>('customer:click', (info) => {
       setOrder(info);
       setCrafting(false);
+      setCraftProgress(0);
       setCraftResult(null);
     });
-    return unsub;
+
+    const unsubProgress = eventBus.on<{ recipeId: string; progress: number }>(
+      'craft:progress',
+      (data) => setCraftProgress(Math.round(data.progress)),
+    );
+
+    return () => { unsubClick(); unsubProgress(); };
   }, []);
 
   if (!order) return null;
@@ -97,7 +105,14 @@ export function OrderPanel() {
             ☕ 制作 {recipe.name}
           </button>
         )}
-        {crafting && <div className="order-panel__crafting">⏳ 制作中...</div>}
+        {crafting && (
+          <div className="order-panel__crafting">
+            <div>⏳ 制作中... {craftProgress}%</div>
+            <div className="order-panel__progress-bar">
+              <div className="order-panel__progress-fill" style={{ width: `${craftProgress}%` }} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
