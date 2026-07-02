@@ -23,9 +23,13 @@ export const useUIStore = create<UIState>((set) => ({
   toasts: [],
 
   setActivePanel: (panel) => set({ activePanel: panel }),
-  togglePanel: (panel) => set((s) => ({
-    activePanel: s.activePanel === panel ? null : panel,
-  })),
+  togglePanel: (panel) => set((s) => {
+    const newPanel = s.activePanel === panel ? null : panel;
+    return {
+      activePanel: newPanel,
+      isEditMode: newPanel === 'decoration',
+    };
+  }),
   setEditMode: (editing) => set({ isEditMode: editing }),
   setLoading: (loading) => set({ isLoading: loading }),
   addToast: (message, type = 'info') =>

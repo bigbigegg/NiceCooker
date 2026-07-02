@@ -22,11 +22,13 @@ export interface EquipmentData {
 /** 家具渲染数据 */
 export interface FurnitureData {
   id: string;
+  catalogId: string;
   type: FurnitureType;
   position: Position;
   width: number;
   height: number;
   variant: FurnitureVariant;
+  rotation: 0 | 90 | 180 | 270;
 }
 
 /** 店铺布局数据 */

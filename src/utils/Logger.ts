@@ -7,7 +7,7 @@
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-export type LogCategory = 'customer' | 'craft' | 'time' | 'render' | 'economy' | 'app' | 'store';
+export type LogCategory = 'customer' | 'craft' | 'time' | 'render' | 'economy' | 'app' | 'store' | 'decoration';
 
 interface LogEntry {
   timestamp: string;

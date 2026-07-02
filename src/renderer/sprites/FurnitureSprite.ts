@@ -247,4 +247,41 @@ export class FurnitureSprite extends Container {
   getFurnitureId(): string {
     return this.data.id;
   }
+
+  /** 更新位置 */
+  updatePosition(x: number, y: number): void {
+    this.x = x;
+    this.y = y;
+    this.data.position = { x, y };
+  }
+
+  /** 显示半透明虚影模式 */
+  setGhostMode(active: boolean): void {
+    this.alpha = active ? 0.5 : 1.0;
+  }
+
+  /** 显示选中高亮 */
+  showHighlight(active: boolean): void {
+    if (active) {
+      const h = new Graphics();
+      h.label = 'highlight';
+      h.roundRect(-this.data.width / 2 - 2, -this.data.height / 2 - 2, this.data.width + 4, this.data.height + 4, 4);
+      h.stroke({ color: 0xFFC107, width: 2 });
+      this.addChild(h);
+    } else {
+      const existing = this.children.find((c) => c.label === 'highlight');
+      if (existing) this.removeChild(existing);
+    }
+  }
+
+  /** 设置旋转 */
+  setRotation(deg: 0 | 90 | 180 | 270): void {
+    this.angle = deg;
+    this.data.rotation = deg;
+  }
+
+  /** 获取家具数据 */
+  getFurnitureData(): Readonly<FurnitureData> {
+    return this.data;
+  }
 }

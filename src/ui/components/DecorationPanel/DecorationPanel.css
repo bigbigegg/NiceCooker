@@ -1,0 +1,128 @@
+.deco-panel {
+  position: absolute;
+  top: 60px;
+  right: 16px;
+  width: 260px;
+  max-height: calc(100% - 120px);
+  background: var(--color-cream);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.deco-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--color-brown-700);
+  color: var(--color-cream);
+  font-weight: 600;
+  font-size: 14px;
+  position: sticky;
+  top: 0;
+}
+
+.deco-panel__close {
+  background: none;
+  border: none;
+  color: var(--color-cream);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.deco-panel__body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.deco-panel__score {
+  font-size: 13px;
+  color: var(--color-brown-800);
+  text-align: center;
+}
+
+.deco-panel__hint {
+  background: #E8F5E9;
+  color: #2E7D32;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deco-panel__cancel {
+  background: none;
+  border: 1px solid #A5D6A7;
+  color: #2E7D32;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.deco-panel__section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-brown-700);
+}
+
+.deco-panel__catalog {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.deco-panel__card {
+  background: #fff;
+  border: 2px solid var(--color-brown-200);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.deco-panel__card:hover {
+  border-color: var(--color-brown-500);
+}
+
+.deco-panel__card--selected {
+  border-color: #4CAF50;
+  background: #E8F5E9;
+}
+
+.deco-panel__card--locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deco-panel__card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.deco-panel__card-size {
+  font-size: 10px;
+  color: var(--color-text-light);
+}
+
+.deco-panel__card-cost {
+  font-size: 12px;
+  color: #E65100;
+  font-weight: 600;
+}
+
+.deco-panel__card-owned {
+  font-size: 10px;
+  color: #2E7D32;
+  margin-top: 2px;
+}

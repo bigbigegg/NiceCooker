@@ -5,7 +5,8 @@ interface PlayerState {
   diamond: number;
   level: number;
   totalExp: number;
-  reputation: number;    // 0-100 店铺口碑
+  reputation: number;
+  ownedFurniture: Record<string, number>;  // catalogId → count
 
   // Actions
   earnGold: (amount: number, source: string) => void;
@@ -23,6 +24,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   level: 1,
   totalExp: 0,
   reputation: 50,
+  ownedFurniture: {},
 
   earnGold: (amount, source) => {
     set((s) => ({ gold: s.gold + amount }));
@@ -56,6 +58,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }));
   },
 
+  addFurniture: (furnitureId: string) =>
+    set((s) => ({
+      ownedFurniture: { ...s.ownedFurniture, [furnitureId]: (s.ownedFurniture[furnitureId] ?? 0) + 1 },
+    })),
   canAfford: (gold, diamond = 0) => {
     const state = get();
     return state.gold >= gold && state.diamond >= diamond;

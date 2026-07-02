@@ -15,6 +15,8 @@ import { RECIPES_BY_ID } from '@/config/recipes';
 import { logger } from '@/utils/Logger';
 import { OrderPanel } from '@/ui/components/OrderPanel/OrderPanel';
 import { CraftingQueue } from '@/ui/components/CraftingQueue/CraftingQueue';
+import { DecorationPanel } from '@/ui/components/DecorationPanel/DecorationPanel';
+import { useDecorationStore } from '@/stores/decorationStore';
 import type { GameTime } from '@/types';
 import './App.css';
 
@@ -26,6 +28,8 @@ export function App() {
   useEffect(() => {
     // 初始化配方 Store
     useRecipeStore.getState().init();
+    // 初始化装修 Store
+    useDecorationStore.getState().init();
     // 启动顾客系统
     customerSystem.start();
     // 启动时间循环
@@ -98,6 +102,7 @@ export function App() {
       <div className="game-area" ref={canvasRef} onClick={() => eventBus.emit('order:close', null)}>
         <GameCanvas containerRef={canvasRef} />
         <OrderPanel />
+        <DecorationPanel />
         <CraftingQueue />
       </div>
       <NavBar />
