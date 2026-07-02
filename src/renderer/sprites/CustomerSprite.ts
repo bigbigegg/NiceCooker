@@ -162,7 +162,7 @@ export class CustomerSprite extends Container {
     const waitProgress = customer.maxPatience > 0
       ? 1 - customer.patience / customer.maxPatience
       : 0;
-    this.drawBubble(customer.satisfaction, customer.orderRecipeId, waitProgress);
+    this.drawBubble(customer.state, customer.satisfaction, customer.orderRecipeId, waitProgress);
   }
 
   /**
@@ -192,12 +192,12 @@ export class CustomerSprite extends Container {
   }
 
   /** 绘制头顶气泡 */
-  private drawBubble(satisfaction: number, orderRecipeId: string | null, waitProgress: number): void {
+  private drawBubble(state: string, satisfaction: number, orderRecipeId: string | null, waitProgress: number): void {
     const bubble = this.bubbleContainer;
     bubble.removeChildren();
 
-    const bubbleW = 56;
-    const bubbleH = 52;
+    const bubbleW = 64;
+    const bubbleH = 48;
     const bubbleX = -bubbleW / 2;
     const bubbleY = -BODY_H / 2 - HEAD_RADIUS * 2 - bubbleH - 2;
 
@@ -206,32 +206,41 @@ export class CustomerSprite extends Container {
     bg.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 5);
     bg.fill({ color: 0xFFFFFF, alpha: 0.92 });
     bg.stroke({ color: 0xBDBDBD, width: 1 });
-    // 三角尖
     bg.moveTo(-4, bubbleY + bubbleH);
     bg.lineTo(0, bubbleY + bubbleH + 5);
     bg.lineTo(4, bubbleY + bubbleH);
     bg.fill({ color: 0xFFFFFF });
     bubble.addChild(bg);
 
-    // 满意度图标
-    const moodIcon = getMoodIcon(satisfaction);
-    const moodText = new Text({
-      text: moodIcon,
-      style: { fontSize: 14, fontFamily: 'Arial' },
+    // 状态文字
+    const stateLabels: Record<string, string> = {
+      entering: '🚶 进店中...',
+      ordering: '📖 浏览菜单...',
+      waiting: '📋 待出餐',
+      eating: '😋 进餐中',
+      leaving: '👋 离开中...',
+    };
+    const label = stateLabels[state] ?? state;
+    const stateText = new Text({
+      text: label,
+      style: { fontSize: 11, fontFamily: 'PingFang SC, sans-serif', fill: 0x3E2723, fontWeight: 'bold' },
     });
-    moodText.anchor.set(0.5, 0);
-    moodText.y = bubbleY + 4;
-    bubble.addChild(moodText);
+    stateText.anchor.set(0.5, 0);
+    stateText.y = bubbleY + 5;
+    stateText.x = 0;
+    bubble.addChild(stateText);
 
-    // 订单图标
-    const recipeIcon = orderRecipeId ? (RECIPE_ICONS[orderRecipeId] ?? '📋') : '📋';
-    const orderText = new Text({
-      text: recipeIcon,
-      style: { fontSize: 12, fontFamily: 'Arial' },
-    });
-    orderText.anchor.set(0.5, 0);
-    orderText.y = bubbleY + 20;
-    bubble.addChild(orderText);
+    // 订单图标 + 菜品名（仅 waiting/eating 时显示）
+    if (orderRecipeId && (state === 'waiting' || state === 'eating')) {
+      const icon = RECIPE_ICONS[orderRecipeId] ?? '☕';
+      const orderText = new Text({
+        text: `${icon}`,
+        style: { fontSize: 12, fontFamily: 'Arial' },
+      });
+      orderText.anchor.set(0.5, 0);
+      orderText.y = bubbleY + 20;
+      bubble.addChild(orderText);
+    }
 
     // 等待进度条
     const barBg = new Graphics();
