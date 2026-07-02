@@ -24,9 +24,11 @@ export function App() {
     // 启动时间循环
     gameLoop.start();
 
-    // 同步时间到 UI（每帧同步，Zustand 浅比较自动跳过未变化的状态）
+    // 同步时间到 UI
+    // 注意：TimeManager 返回的是同一对象引用（in-place 更新），
+    // 必须浅拷贝创建新对象，Zustand 才能检测到变化并触发重渲染。
     const unsubTime = eventBus.on<{ time: GameTime }>('time:tick', ({ time }) => {
-      useTimeStore.getState().setTime(time);
+      useTimeStore.getState().setTime({ ...time });
     });
 
     setLoading(false);

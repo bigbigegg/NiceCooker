@@ -22,8 +22,6 @@ export function StatusBar() {
     const current = speeds.indexOf(time.speed);
     const next = speeds[(current + 1) % speeds.length]!;
     gameLoop.timeManager.setSpeed(next);
-    // 直接更新 store 中的 speed
-    useTimeStore.getState().setTime({ ...time, speed: next });
   };
 
   return (
