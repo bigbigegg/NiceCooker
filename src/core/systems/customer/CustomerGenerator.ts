@@ -81,7 +81,7 @@ export class CustomerGenerator {
     const trafficMultiplier = PHASE_TRAFFIC_MULTIPLIER[phase] ?? 0;
 
     // 基础值
-    const base = 0.75;
+    const base = 1.5;
 
     // 时段系数
     const phaseFactor = trafficMultiplier;
