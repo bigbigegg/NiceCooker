@@ -36,7 +36,8 @@ export function OrderPanel() {
       logger.info('app', `🔨 开始制作 ${recipe.name} for customer=${order.customerId}`);
       crafting.startCrafting(order.customerId);
     } else {
-      setCraftResult('⏳ 制作队列已满，请等待...');
+      // 槽位已满，不更新 result（保留之前的完成信息）
+      logger.warn('app', `⏳ 制作队列已满 for customer=${order.customerId}`);
     }
   };
 
