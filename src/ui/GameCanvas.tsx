@@ -6,12 +6,14 @@ interface GameCanvasProps {
 }
 
 /**
- * PixiJS 画布 — 简化版
- * 使用 fixed size，避免 resize 问题
+ * PixiJS 画布
+ *
+ * 等待容器有有效尺寸后再初始化，并用 CSS 让 canvas 填满容器。
  */
 export function GameCanvas({ containerRef }: GameCanvasProps) {
   const appRef = useRef<Application | null>(null);
   const [webglError, setWebglError] = useState(false);
+  const canvasWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -19,36 +21,49 @@ export function GameCanvas({ containerRef }: GameCanvasProps) {
 
     let cancelled = false;
 
-    const initPixi = async () => {
-      try {
-        const app = new Application();
-        await app.init({
-          width: container.clientWidth || 800,
-          height: container.clientHeight || 600,
-          background: '#EFEBE9',
-          antialias: false,
-          resolution: 1,
-        });
-
-        if (cancelled) {
-          app.destroy(true);
-          return;
-        }
-
-        appRef.current = app;
-        container.appendChild(app.canvas as HTMLCanvasElement);
-        (app.canvas as HTMLCanvasElement).style.display = 'block';
-      } catch {
-        setWebglError(true);
+    const tryInit = () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w === 0 || h === 0) {
+        // 容器尚未布局完成，等待下一帧
+        if (!cancelled) requestAnimationFrame(tryInit);
+        return;
       }
+
+      const app = new Application();
+      appRef.current = app;
+
+      app.init({
+        width: w,
+        height: h,
+        background: '#EFEBE9',
+        antialias: true,
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true,
+      }).then(() => {
+        if (cancelled) { app.destroy(true); return; }
+
+        // 挂载 canvas
+        const canvas = app.canvas as HTMLCanvasElement;
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.display = 'block';
+
+        if (canvasWrapperRef.current) {
+          canvasWrapperRef.current.appendChild(canvas);
+        }
+      }).catch(() => {
+        if (!cancelled) setWebglError(true);
+      });
     };
 
-    initPixi();
+    // 延迟一帧确保容器已布局
+    requestAnimationFrame(tryInit);
 
     return () => {
       cancelled = true;
       if (appRef.current) {
-        try { appRef.current.destroy(true); } catch { /* PixiJS 8 清理异常 */ }
+        try { appRef.current.destroy(true); } catch { /* PixiJS 8 */ }
         appRef.current = null;
       }
     };
@@ -68,5 +83,5 @@ export function GameCanvas({ containerRef }: GameCanvasProps) {
     );
   }
 
-  return null;
+  return <div ref={canvasWrapperRef} style={{ width: '100%', height: '100%' }} />;
 }
