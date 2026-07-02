@@ -32,19 +32,19 @@ const RECIPE_ICONS: Record<string, string> = {
 
 /** 头部半径 */
 const HEAD_RADIUS = 10;
-/** 身体宽度 */
+/** 身体宽高 */
 const BODY_W = 15;
-/** 身体高度 */
 const BODY_H = 18;
-/** 身体圆角 */
 const BODY_R = 4;
+
+/** 离开动画持续时间（秒） */
+const LEAVE_ANIM_DURATION = 0.8;
 
 /**
  * 顾客精灵
  *
  * Q 版二头身角色：圆形头 + 圆角矩形身体。
  * 头顶气泡显示满意度、订单图标、等待进度。
- * 支持 entering / waiting / eating / leaving 状态动画。
  */
 export class CustomerSprite extends Container {
   private customerId: string;
@@ -53,16 +53,19 @@ export class CustomerSprite extends Container {
   private bodyGfx: Graphics;
   private bubbleContainer: Container;
   private animTimer: number;
-  private _state: string;
-  private _position: Position;
+  private currentState: string;
+  private worldPos: Position;
+  private leavingCallback: (() => void) | null = null;
+  private leavingElapsed: number = 0;
+  private isLeaving: boolean = false;
 
   constructor(customer: CustomerInstance, position: Position) {
     super();
     this.customerId = customer.id;
     this.typeId = customer.typeId;
     this.animTimer = 0;
-    this._state = customer.state;
-    this._position = { ...position };
+    this.currentState = customer.state;
+    this.worldPos = { ...position };
 
     const color = TYPE_COLORS[this.typeId];
 
@@ -78,27 +81,25 @@ export class CustomerSprite extends Container {
 
     this.x = position.x;
     this.y = position.y;
+    this.alpha = 0; // 从透明开始渐入
   }
 
-  /** 绘制角色 */
+  /** 绘制二头身角色 */
   private drawCharacter(color: number): void {
-    // 身体（圆角矩形）
     this.bodyGfx.clear();
     this.bodyGfx.roundRect(-BODY_W / 2, -BODY_H / 2, BODY_W, BODY_H, BODY_R);
     this.bodyGfx.fill({ color });
 
-    // 头部（圆形）
     this.headGfx.clear();
     const headY = -BODY_H / 2 - HEAD_RADIUS + 1;
     this.headGfx.circle(0, headY, HEAD_RADIUS);
     this.headGfx.fill({ color });
 
-    // 眼睛（白色+黑色瞳孔）
+    // 眼睛
     this.headGfx.circle(-4, headY - 2, 2.5);
     this.headGfx.fill({ color: 0xFFFFFF });
     this.headGfx.circle(-4, headY - 2, 1.3);
     this.headGfx.fill({ color: 0x212121 });
-
     this.headGfx.circle(4, headY - 2, 2.5);
     this.headGfx.fill({ color: 0xFFFFFF });
     this.headGfx.circle(4, headY - 2, 1.3);
@@ -116,16 +117,64 @@ export class CustomerSprite extends Container {
   }
 
   /**
-   * 更新头顶气泡
-   * @param satisfaction - 满意度 0-100
-   * @param orderRecipeId - 订单菜品 ID
-   * @param waitProgress - 等待进度 0-1
+   * 单帧更新（由 RenderSystem 调用）
+   * 同时更新状态动画和气泡信息。
    */
-  updateBubble(
-    satisfaction: number,
-    orderRecipeId: string | null,
-    waitProgress: number,
-  ): void {
+  updateState(customer: CustomerInstance): void {
+    if (this.isLeaving) return;
+
+    this.currentState = customer.state;
+    this.animTimer += 1 / 60; // 近似 deltaSeconds
+
+    // 状态动画
+    switch (customer.state) {
+      case 'entering':
+        this.alpha = Math.min(1, this.alpha + 0.05);
+        break;
+      case 'waiting':
+      case 'ordering':
+        this.x = this.worldPos.x + Math.sin(this.animTimer * 3) * 1.5;
+        break;
+      case 'eating':
+        this.scale.set(1.1, 0.85);
+        break;
+    }
+
+    // 更新气泡
+    const waitProgress = customer.maxPatience > 0
+      ? 1 - customer.patience / customer.maxPatience
+      : 0;
+    this.drawBubble(customer.satisfaction, customer.orderRecipeId, waitProgress);
+  }
+
+  /**
+   * 播放离开动画
+   * @param onComplete - 动画完成回调
+   */
+  animateLeave(onComplete: () => void): void {
+    this.isLeaving = true;
+    this.leavingElapsed = 0;
+    this.leavingCallback = onComplete;
+    this.hideBubble();
+
+    // 使用 PixiJS Ticker 或自行驱动
+    const tick = (): void => {
+      if (!this.isLeaving) return;
+      this.leavingElapsed += 1 / 60;
+      this.alpha = Math.max(0, 1 - this.leavingElapsed / LEAVE_ANIM_DURATION);
+
+      if (this.leavingElapsed >= LEAVE_ANIM_DURATION) {
+        this.isLeaving = false;
+        this.leavingCallback?.();
+      } else {
+        requestAnimationFrame(tick);
+      }
+    };
+    tick();
+  }
+
+  /** 绘制头顶气泡 */
+  private drawBubble(satisfaction: number, orderRecipeId: string | null, waitProgress: number): void {
     const bubble = this.bubbleContainer;
     bubble.removeChildren();
 
@@ -139,8 +188,7 @@ export class CustomerSprite extends Container {
     bg.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 5);
     bg.fill({ color: 0xFFFFFF, alpha: 0.92 });
     bg.stroke({ color: 0xBDBDBD, width: 1 });
-
-    // 气泡三角
+    // 三角尖
     bg.moveTo(-4, bubbleY + bubbleH);
     bg.lineTo(0, bubbleY + bubbleH + 5);
     bg.lineTo(4, bubbleY + bubbleH);
@@ -148,7 +196,7 @@ export class CustomerSprite extends Container {
     bubble.addChild(bg);
 
     // 满意度图标
-    const moodIcon = this.getMoodIcon(satisfaction);
+    const moodIcon = getMoodIcon(satisfaction);
     const moodText = new Text({
       text: moodIcon,
       style: { fontSize: 14, fontFamily: 'Arial' },
@@ -167,16 +215,14 @@ export class CustomerSprite extends Container {
     orderText.y = bubbleY + 20;
     bubble.addChild(orderText);
 
-    // 等待进度条背景
+    // 等待进度条
     const barBg = new Graphics();
     barBg.roundRect(bubbleX + 8, bubbleY + 38, bubbleW - 16, 4, 2);
     barBg.fill({ color: 0xE0E0E0 });
     bubble.addChild(barBg);
 
-    // 等待进度条
     const clamped = Math.max(0, Math.min(1, waitProgress));
-    const barColor =
-      clamped > 0.6 ? 0xEF5350 : clamped > 0.3 ? 0xFFCA28 : 0x66BB6A;
+    const barColor = clamped > 0.6 ? 0xEF5350 : clamped > 0.3 ? 0xFFCA28 : 0x66BB6A;
     const barFill = new Graphics();
     barFill.roundRect(bubbleX + 8, bubbleY + 38, (bubbleW - 16) * clamped, 4, 2);
     barFill.fill({ color: barColor });
@@ -186,58 +232,22 @@ export class CustomerSprite extends Container {
   }
 
   /** 隐藏气泡 */
-  hideBubble(): void {
+  private hideBubble(): void {
     this.bubbleContainer.visible = false;
     this.bubbleContainer.removeChildren();
-  }
-
-  /**
-   * 更新状态动画
-   */
-  updateAnimation(state: string, deltaSeconds: number): void {
-    this._state = state;
-    this.animTimer += deltaSeconds;
-
-    switch (state) {
-      case 'entering':
-        this.alpha = Math.min(1, this.alpha + deltaSeconds * 2.5);
-        break;
-      case 'waiting':
-      case 'ordering':
-        // 轻微左右摆动
-        this.x = this._position.x + Math.sin(this.animTimer * 3) * 1.5;
-        break;
-      case 'eating':
-        // 坐姿：身体压扁一点
-        this.scale.y = 0.85;
-        this.scale.x = 1.1;
-        break;
-      case 'leaving':
-        this.alpha = Math.max(0, this.alpha - deltaSeconds * 2.5);
-        break;
-    }
-  }
-
-  /** 更新世界坐标位置 */
-  updatePosition(pos: Position): void {
-    this._position = { ...pos };
-    if (this._state !== 'waiting' && this._state !== 'ordering') {
-      this.x = pos.x;
-    }
-    this.y = pos.y;
   }
 
   /** 获取顾客 ID */
   getCustomerId(): string {
     return this.customerId;
   }
+}
 
-  /** 获取满意度图标 */
-  private getMoodIcon(satisfaction: number): string {
-    if (satisfaction >= 80) return '\u{1F604}';
-    if (satisfaction >= 60) return '\u{1F642}';
-    if (satisfaction >= 40) return '\u{1F610}';
-    if (satisfaction >= 20) return '\u{1F61F}';
-    return '\u{1F621}';
-  }
+/** 满意度 -> 表情图标 */
+function getMoodIcon(satisfaction: number): string {
+  if (satisfaction >= 80) return '\u{1F604}';
+  if (satisfaction >= 60) return '\u{1F642}';
+  if (satisfaction >= 40) return '\u{1F610}';
+  if (satisfaction >= 20) return '\u{1F61F}';
+  return '\u{1F621}';
 }

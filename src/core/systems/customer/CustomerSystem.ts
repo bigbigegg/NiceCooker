@@ -47,16 +47,15 @@ export class CustomerSystem {
     gameLoop.registerSystem('CustomerSystem', (deltaSeconds) => this.update(deltaSeconds), 10);
 
     // 监听出餐完成事件，标记顾客为已服务
-    this.unsubServe = eventBus.on<{ customerId: string }>(
+    this.unsubServe = eventBus.on<{ customerId: string; satisfaction: number }>(
       'customer:serve',
-      ({ customerId }) => {
+      ({ customerId, satisfaction }) => {
         // 顾客可能已经离店，需要检查
         const store = useCustomerStore.getState();
         const customer = store.customers[customerId];
         if (customer) {
-          // 品质信息由 craft 系统提供，此处使用默认值（后续通过事件数据传入）
-          // 注：当前 customer:serve 事件包含 satisfaction 字段，根据 TDD 定义应与品质星级对应
-          store.markServed(customerId, 3); // 默认 3 星品质
+          // satisfaction 在此表示餐品品质分数 (0-100)，用于后续满意度计算
+          store.markServed(customerId, satisfaction);
         }
       },
     );

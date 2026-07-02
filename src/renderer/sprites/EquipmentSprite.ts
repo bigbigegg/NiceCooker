@@ -20,20 +20,20 @@ const LEVEL_COLOR_DELTA = 0x0A0A0A;
 export class EquipmentSprite extends Container {
   private data: EquipmentData;
   private gfx: Graphics;
-  private label: Text;
+  private labelText: Text;
 
   constructor(data: EquipmentData) {
     super();
     this.data = data;
     this.gfx = new Graphics();
-    this.label = new Text({
+    this.labelText = new Text({
       text: '',
       style: { fontSize: 10, fontFamily: 'Arial', fill: 0xFFFFFF },
     });
 
     this.draw();
     this.addChild(this.gfx);
-    this.addChild(this.label);
+    this.addChild(this.labelText);
 
     this.x = data.position.x;
     this.y = data.position.y;
@@ -106,9 +106,9 @@ export class EquipmentSprite extends Container {
       g.fill({ color: 0xFFC107 });
     }
 
-    this.label.text = `咖啡机 Lv${this.data.level}`;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h / 2 + 4;
+    this.labelText.text = `咖啡机 Lv${this.data.level}`;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h / 2 + 4;
   }
 
   /** 绘制烤箱 */
@@ -154,9 +154,9 @@ export class EquipmentSprite extends Container {
       g.fill({ color: 0x4CAF50 });
     }
 
-    this.label.text = `烤箱 Lv${this.data.level}`;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h / 2 + 4;
+    this.labelText.text = `烤箱 Lv${this.data.level}`;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h / 2 + 4;
   }
 
   /** 绘制磨豆机 */
@@ -199,9 +199,9 @@ export class EquipmentSprite extends Container {
       g.stroke({ color: 0xFFC107, width: 1 });
     }
 
-    this.label.text = `磨豆机 Lv${this.data.level}`;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h * 0.4 + 4;
+    this.labelText.text = `磨豆机 Lv${this.data.level}`;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h * 0.4 + 4;
   }
 
   /** 获取设备 ID */

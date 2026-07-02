@@ -35,20 +35,20 @@ const FURNITURE_NAMES: Record<FurnitureType, string> = {
 export class FurnitureSprite extends Container {
   private data: FurnitureData;
   private gfx: Graphics;
-  private label: Text;
+  private labelText: Text;
 
   constructor(data: FurnitureData) {
     super();
     this.data = data;
     this.gfx = new Graphics();
-    this.label = new Text({
+    this.labelText = new Text({
       text: '',
       style: { fontSize: 10, fontFamily: 'Arial', fill: 0xFFFFFF },
     });
 
     this.draw();
     this.addChild(this.gfx);
-    this.addChild(this.label);
+    this.addChild(this.labelText);
 
     this.x = data.position.x;
     this.y = data.position.y;
@@ -110,9 +110,9 @@ export class FurnitureSprite extends Container {
     // 椅子（右侧）
     this.drawChair(g, cx + w / 2 + 10, cy, color);
 
-    this.label.text = FURNITURE_NAMES.table2;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h / 2 + 14;
+    this.labelText.text = FURNITURE_NAMES.table2;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h / 2 + 14;
   }
 
   /** 绘制 4 人方桌 + 四把椅子 */
@@ -154,9 +154,9 @@ export class FurnitureSprite extends Container {
     this.drawChair(g, cx + w / 2 + 10, cy - h / 4, color);
     this.drawChair(g, cx + w / 2 + 10, cy + h / 4, color);
 
-    this.label.text = FURNITURE_NAMES.table4;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h / 2 + 20;
+    this.labelText.text = FURNITURE_NAMES.table4;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h / 2 + 20;
   }
 
   /** 绘制沙发 */
@@ -190,9 +190,9 @@ export class FurnitureSprite extends Container {
     g.roundRect(cx + w / 2 - 4, cy, 8, h * 0.6, 3);
     g.fill({ color: color - 0x111111 });
 
-    this.label.text = FURNITURE_NAMES.sofa;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h / 2 + 16;
+    this.labelText.text = FURNITURE_NAMES.sofa;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h / 2 + 16;
   }
 
   /** 绘制吧台凳 */
@@ -223,9 +223,9 @@ export class FurnitureSprite extends Container {
     g.arc(cx, cy - h * 0.1, w * 0.3, Math.PI, 0);
     g.stroke({ color: 0x757575, width: 2 });
 
-    this.label.text = FURNITURE_NAMES.barStool;
-    this.label.anchor.set(0.5, 0);
-    this.label.y = cy + h / 2 + 8;
+    this.labelText.text = FURNITURE_NAMES.barStool;
+    this.labelText.anchor.set(0.5, 0);
+    this.labelText.y = cy + h / 2 + 8;
   }
 
   /** 绘制一把椅子（通用） */
