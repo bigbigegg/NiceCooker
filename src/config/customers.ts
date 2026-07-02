@@ -1,12 +1,12 @@
-import type { CustomerTypeId } from '@/types/customer';
+import type { CustomerTypeId, CustomerTypeConfig } from '@/types/customer';
 
 /** 顾客类型基础默认值（未在具体类型中指定的字段将使用此默认值） */
-const CUSTOMER_DEFAULTS = {
+const CUSTOMER_DEFAULTS: CustomerTypeConfig = {
   patience: 120,
   spendingPower: 1.0,
   tipRate: 0.1,
-  preferences: [] as string[],
-  appearTimes: ['all'] as string[],
+  preferences: [],
+  appearTimes: ['all'],
   speedSensitivity: 0.5,
   qualitySensitivity: 0.5,
   environmentSensitivity: 0.3,
@@ -16,23 +16,6 @@ const CUSTOMER_DEFAULTS = {
   returnThreshold: 5,
   returnSpendingBonus: 0.1,
 };
-
-/** 单类顾客配置 */
-export interface CustomerTypeConfig {
-  patience: number;
-  spendingPower: number;
-  tipRate: number;
-  preferences: string[];
-  appearTimes: string[];
-  speedSensitivity: number;
-  qualitySensitivity: number;
-  environmentSensitivity: number;
-  appearWeight: number;
-  minSpending: number;
-  maxSpending: number;
-  returnThreshold: number;
-  returnSpendingBonus: number;
-}
 
 /** 7 种顾客类型配置（Game-Design 3.1.2） */
 export const CUSTOMER_TYPES: Record<CustomerTypeId, CustomerTypeConfig> = {

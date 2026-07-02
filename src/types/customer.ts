@@ -1,5 +1,3 @@
-import type { CustomerTypeConfig } from '@/config/customers';
-
 /** 顾客类型 ID */
 export type CustomerTypeId =
   | 'officeWorker'
@@ -9,6 +7,23 @@ export type CustomerTypeId =
   | 'business'
   | 'artist'
   | 'special';
+
+/** 单类顾客配置 */
+export interface CustomerTypeConfig {
+  patience: number;
+  spendingPower: number;
+  tipRate: number;
+  preferences: string[];
+  appearTimes: string[];
+  speedSensitivity: number;
+  qualitySensitivity: number;
+  environmentSensitivity: number;
+  appearWeight: number;
+  minSpending: number;
+  maxSpending: number;
+  returnThreshold: number;
+  returnSpendingBonus: number;
+}
 
 /** 顾客状态 */
 export type CustomerStateType =
