@@ -8,6 +8,7 @@ import { gameLoop } from '@/core/GameLoop';
 import { eventBus } from '@/core/EventBus';
 import { customerSystem } from '@/core/systems/customer/CustomerSystem';
 import { useRecipeStore } from '@/stores/recipeStore';
+import { OrderPanel } from '@/ui/components/OrderPanel/OrderPanel';
 import type { GameTime } from '@/types';
 import './App.css';
 
@@ -54,6 +55,7 @@ export function App() {
       <StatusBar />
       <div className="game-area" ref={canvasRef}>
         <GameCanvas containerRef={canvasRef} />
+        <OrderPanel />
       </div>
       <NavBar />
     </div>

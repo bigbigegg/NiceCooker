@@ -1,0 +1,83 @@
+.order-panel {
+  position: absolute;
+  top: 60px;
+  right: 16px;
+  width: 240px;
+  background: var(--color-cream);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.order-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--color-brown-700);
+  color: var(--color-cream);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.order-panel__close {
+  background: none;
+  border: none;
+  color: var(--color-cream);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.order-panel__body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-panel__order {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.order-panel__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.order-panel__step {
+  font-size: 11px;
+  background: var(--color-brown-200);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: var(--color-brown-700);
+}
+
+.order-panel__craft-btn {
+  background: var(--color-brown-600);
+  color: var(--color-cream);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.order-panel__craft-btn:hover {
+  background: var(--color-brown-700);
+}
+
+.order-panel__crafting {
+  text-align: center;
+  color: var(--color-brown-600);
+  font-size: 14px;
+}
+
+.order-panel__result {
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-brown-800);
+}

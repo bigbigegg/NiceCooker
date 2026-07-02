@@ -2,6 +2,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import type { CustomerInstance, CustomerTypeId } from '@/types/customer';
 import type { Position } from '@/types';
 import { CUSTOMER_COLORS } from '../types';
+import { eventBus } from '@/core/EventBus';
 
 /** 顾客类型对应颜色 */
 const TYPE_COLORS: Record<CustomerTypeId, number> = {
@@ -81,7 +82,20 @@ export class CustomerSprite extends Container {
 
     this.x = position.x;
     this.y = position.y;
-    this.alpha = 0; // 从透明开始渐入
+    this.alpha = 0;
+
+    // 点击交互
+    this.eventMode = 'static';
+    this.cursor = 'pointer';
+    this.hitArea = { contains: (x, y) => x >= -20 && x <= 20 && y >= -35 && y <= 20 };
+    this.on('pointerdown', () => {
+      eventBus.emit('customer:click', {
+        customerId: customer.id,
+        typeId: customer.typeId,
+        orderRecipeId: customer.orderRecipeId,
+        state: customer.state,
+      });
+    });
   }
 
   /** 绘制二头身角色 */
